@@ -1,0 +1,152 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model State {
+  id        String     @id @default(uuid())
+  name      String     @unique
+  districts District[]
+}
+
+model District {
+  id        String   @id @default(uuid())
+  name      String
+  stateId   String
+  state     State    @relation(fields: [stateId], references: [id])
+  phcs      Phc[]
+
+  @@unique([name, stateId])
+}
+
+model Phc {
+  id                String    @id @default(uuid())
+  name              String
+  districtId        String
+  district          District  @relation(fields: [districtId], references: [id])
+  type              String    @default("NORMAL") // NORMAL, HIGH_DEMAND, SHORTAGE, SURGE, STAFF_SHORTAGE, EMERGENCY
+  latitude          Float?
+  longitude         Float?
+  totalBeds         Int       @default(0)
+  doctorsRequired   Int       @default(0)
+  nursesRequired    Int       @default(0)
+  
+  users             User[]
+  inventories       Inventory[]
+  patientFootfalls  PatientFootfall[]
+  bedOccupancies    BedOccupancy[]
+  staffAttendances  StaffAttendance[]
+  alerts            Alert[]
+  riskScores        RiskScore[]
+  
+  transfersFrom     MedicineTransfer[] @relation("TransferFrom")
+  transfersTo       MedicineTransfer[] @relation("TransferTo")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   // NATIONAL_ADMIN, STATE_ADMIN, DISTRICT_ADMIN, PHC_ADMIN, PHC_STAFF
+  phcId     String?
+  phc       Phc?     @relation(fields: [phcId], references: [id])
+}
+
+model Medicine {
+  id          String   @id @default(uuid())
+  name        String
+  category    String
+  unit        String
+  safetyStock Int      @default(100)
+  inventories Inventory[]
+  transfers   MedicineTransfer[]
+}
+
+model Inventory {
+  id           String   @id @default(uuid())
+  date         DateTime @default(now())
+  phcId        String
+  phc          Phc      @relation(fields: [phcId], references: [id])
+  medicineId   String
+  medicine     Medicine @relation(fields: [medicineId], references: [id])
+  openingStock Int
+  received     Int      @default(0)
+  consumed     Int      @default(0)
+  closingStock Int
+
+  @@unique([date, phcId, medicineId])
+}
+
+model PatientFootfall {
+  id               String   @id @default(uuid())
+  date             DateTime @default(now())
+  phcId            String
+  phc              Phc      @relation(fields: [phcId], references: [id])
+  totalPatients    Int
+  emergencyCases   Int
+  feverCases       Int
+  respiratoryCases Int
+
+  @@unique([date, phcId])
+}
+
+model BedOccupancy {
+  id            String   @id @default(uuid())
+  date          DateTime @default(now())
+  phcId         String
+  phc           Phc      @relation(fields: [phcId], references: [id])
+  totalBeds     Int
+  occupiedBeds  Int
+  availableBeds Int
+
+  @@unique([date, phcId])
+}
+
+model StaffAttendance {
+  id               String   @id @default(uuid())
+  date             DateTime @default(now())
+  phcId            String
+  phc              Phc      @relation(fields: [phcId], references: [id])
+  doctorsPresent   Int
+  nursesPresent    Int
+
+  @@unique([date, phcId])
+}
+
+model MedicineTransfer {
+  id          String   @id @default(uuid())
+  date        DateTime @default(now())
+  fromPhcId   String
+  fromPhc     Phc      @relation("TransferFrom", fields: [fromPhcId], references: [id])
+  toPhcId     String
+  toPhc       Phc      @relation("TransferTo", fields: [toPhcId], references: [id])
+  medicineId  String
+  medicine    Medicine @relation(fields: [medicineId], references: [id])
+  quantity    Int
+  status      String   @default("RECOMMENDED") // RECOMMENDED, APPROVED, SHIPPED, COMPLETED, CANCELLED
+}
+
+model Alert {
+  id          String   @id @default(uuid())
+  date        DateTime @default(now())
+  phcId       String
+  phc         Phc      @relation(fields: [phcId], references: [id])
+  alertType   String   // STOCK_OUT, BED_CAPACITY, PATIENT_SURGE, STAFF_SHORTAGE, EMERGENCY
+  severity    String   // LOW, MEDIUM, HIGH, CRITICAL
+  message     String
+  status      String   @default("ACTIVE") // ACTIVE, RESOLVED
+}
+
+model RiskScore {
+  id          String   @id @default(uuid())
+  date        DateTime @default(now())
+  phcId       String
+  phc         Phc      @relation(fields: [phcId], references: [id])
+  score       Float    // 0-100
+  factors     String   // JSON string of risk factors
+}
