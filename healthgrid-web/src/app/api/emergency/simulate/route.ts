@@ -1,102 +1,89 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { getHealthGridPHCs, getHealthGridInventories } from '@/lib/upstash';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
-    const { patientDemandIncrease, medicineDemandIncrease, phcUnavailable } = await req.json();
+    const { patientDemandIncrease = 0, medicineDemandIncrease = 0, phcUnavailable = '' } = await req.json();
 
-    // 1. Fetch current network baseline
-    const phcs = await prisma.phc.findMany({
-      include: {
-        inventories: {
-          orderBy: { date: 'desc' },
-          take: 1
-        },
-        patientFootfalls: {
-          orderBy: { date: 'desc' },
-          take: 1
-        },
-        bedOccupancies: {
-          orderBy: { date: 'desc' },
-          take: 1
-        }
-      }
-    });
+    // 1. Fetch current network baseline from Upstash / Memory
+    const phcs = await getHealthGridPHCs();
+    const inventories = await getHealthGridInventories();
 
-    // 2. Run simulation calculations
+    // 2. Run Digital Twin simulation calculations
     const simulationResults = phcs.map((phc: any) => {
-      let simulatedRisk = 0;
-      let cascadeEffects: string[] = [];
+      let simulatedRisk = phc.riskScore || 20;
+      const cascadeEffects: string[] = [];
 
-      // Base metrics
-      let currentPatients = phc.patientFootfalls[0]?.totalPatients || 100;
-      let currentBedOccupancy = phc.bedOccupancies[0]?.occupiedBeds || 10;
-      let totalBeds = phc.bedOccupancies[0]?.totalBeds || 20;
+      let currentPatients = 120;
+      let totalBeds = phc.totalBeds || 30;
+      let currentBedOccupancy = Math.round(totalBeds * 0.7);
 
       // Apply multipliers
       let simPatients = currentPatients * (1 + (patientDemandIncrease / 100));
-      
-      // Cascade effect logic (If a nearby PHC is closed, patients migrate here)
+
+      // Cascade effect logic (If an adjacent PHC is closed, patients migrate here)
       if (phcUnavailable && phcUnavailable !== phc.id) {
-        // Simplified distance check: assume some migration
-        simPatients += currentPatients * 0.15; // 15% spillover
-        cascadeEffects.push(`15% patient spillover from closed facility (${phcUnavailable})`);
+        simPatients += currentPatients * 0.20; // 20% patient spillover
+        cascadeEffects.push(`20% patient spillover from offline facility (${phcUnavailable})`);
       }
 
       // Calculate new bed pressure
-      let simBedsNeeded = currentBedOccupancy * (simPatients / currentPatients);
-      let bedPressure = simBedsNeeded / totalBeds;
-      
+      const simBedsNeeded = currentBedOccupancy * (simPatients / currentPatients);
+      const bedPressure = simBedsNeeded / totalBeds;
+
       if (bedPressure > 0.85) {
-        simulatedRisk += 40;
-        cascadeEffects.push(`Bed capacity exceeded (Projected: ${Math.round(simBedsNeeded)} / ${totalBeds})`);
+        simulatedRisk += 35;
+        cascadeEffects.push(`Bed capacity critical (Projected: ${Math.round(simBedsNeeded)} / ${totalBeds} beds)`);
       }
 
-      // Medicine logic
-      let medicineStock = phc.inventories[0]?.closingStock || 500;
-      let baseConsumption = phc.inventories[0]?.consumed || 50;
-      let simConsumption = baseConsumption * (1 + (medicineDemandIncrease / 100)) * (simPatients / currentPatients);
-      let simDaysRemaining = medicineStock / simConsumption;
+      // Medicine stock assessment
+      const phcStock = inventories[phc.id]?.['MED_PARA_500']?.stock || 500;
+      const baseConsumption = inventories[phc.id]?.['MED_PARA_500']?.dailyConsumption || 50;
+      const simConsumption = baseConsumption * (1 + (medicineDemandIncrease / 100)) * (simPatients / currentPatients);
+      const simDaysRemaining = simConsumption > 0 ? phcStock / simConsumption : 999;
 
       if (simDaysRemaining < 3) {
-        simulatedRisk += 50;
-        cascadeEffects.push(`Critical medicine shortage projected (Cover: ${simDaysRemaining.toFixed(1)} days)`);
+        simulatedRisk += 45;
+        cascadeEffects.push(`Critical medicine stock-out projected (Cover: ${simDaysRemaining.toFixed(1)} days)`);
       } else if (simDaysRemaining < 7) {
-        simulatedRisk += 25;
+        simulatedRisk += 20;
       }
 
-      // Cap risk at 100
-      simulatedRisk = Math.min(100, simulatedRisk);
-      let status = simulatedRisk > 80 ? 'CRITICAL' : simulatedRisk > 50 ? 'HIGH' : simulatedRisk > 20 ? 'WATCH' : 'STABLE';
+      // Clamp risk score to 100
+      simulatedRisk = Math.min(100, Math.round(simulatedRisk));
+      const status = simulatedRisk > 80 ? 'CRITICAL' : simulatedRisk > 50 ? 'HIGH' : simulatedRisk > 25 ? 'WATCH' : 'STABLE';
 
       return {
         phcId: phc.id,
         name: phc.name,
+        district: phc.district,
+        state: phc.state,
         simulatedRisk,
         status,
         projectedPatients: Math.round(simPatients),
-        projectedBedOccupancy: Math.round((simBedsNeeded / totalBeds) * 100),
+        projectedBedOccupancy: Math.min(100, Math.round((simBedsNeeded / totalBeds) * 100)),
         cascadeEffects
       };
     });
 
-    // 3. Filter for impacted PHCs and sort by severity
+    // Filter for impacted PHCs and sort by risk
     const impacted = simulationResults
       .filter((r: any) => r.cascadeEffects.length > 0 || r.status === 'CRITICAL' || r.status === 'HIGH')
       .sort((a: any, b: any) => b.simulatedRisk - a.simulatedRisk);
 
-    // 4. Generate AI Recommendations based on the digital twin state
     const recommendations: string[] = [];
     if (impacted.length > 0) {
-      recommendations.push("Activate Emergency State Logistics Protocol for District.");
-      recommendations.push("Authorize inter-district medicine transfers prioritizing CRITICAL facilities.");
-      if (impacted.some((i: any) => i.projectedBedOccupancy > 100)) {
-        recommendations.push("Deploy mobile medical units and temporary beds to relieve bed pressure.");
+      recommendations.push("Activate State Healthcare Reserve Protocol for affected district clusters.");
+      recommendations.push("Authorize automated inter-district medicine redistribution prioritizing CRITICAL nodes.");
+      if (impacted.some((i: any) => i.projectedBedOccupancy >= 90)) {
+        recommendations.push("Deploy mobile surge units and temporary bed partitions to prevent admission bottlenecks.");
       }
     }
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       data: {
         impactedFacilities: impacted.length,
         networkStatus: impacted.length > 5 ? 'SEVERE_STRESS' : 'MODERATE_STRESS',
@@ -104,7 +91,6 @@ export async function POST(req: Request) {
         recommendations
       }
     });
-
   } catch (error: any) {
     console.error('Simulation Error:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
