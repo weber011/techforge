@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  HeartPulse, Search, MapPin, Phone, Navigation, ShieldCheck, 
+  HeartPulse, Search, MapPin, Phone, Navigation, ShieldCheck, Activity,
   Building2, Bot, Send, User, Sparkles, MessageSquare, X, ChevronRight, 
   AlertCircle, RefreshCw, AlertTriangle, ExternalLink, CheckCircle2, Locate
 } from 'lucide-react';
@@ -665,6 +665,170 @@ export default function PublicPortal() {
 
           </div>
 
+        </div>
+
+        {/* JHARKHAND GOVT MEDICAL FIELD HIGHLIGHTS GALLERY */}
+        <div className="w-full mt-10 pt-8 border-t-2 border-emerald-200">
+          <div className="flex flex-col gap-6">
+            
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-emerald-100 pb-3">
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-100 text-[#064e3b] text-[10px] font-black rounded-full uppercase mb-1">
+                  <Activity className="w-3 h-3 text-[#047857]" />
+                  <span>झारखंड सरकार &bull; उपलब्धियां</span>
+                </div>
+                <h3 className="text-base sm:text-lg font-black text-[#064e3b] uppercase">
+                  चिकित्सा एवं स्वास्थ्य क्षेत्र की प्रमुख उपलब्धियां (Medical Field Highlights)
+                </h3>
+                <p className="text-[11px] text-slate-600 font-semibold">
+                  Department of Health Initiatives in Rural PHC Upgrades, 108 Ambulances, Hospital Infrastructure, and Specialist Care
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              
+              {/* Card 1 */}
+              <div className="bg-white rounded-xl border border-emerald-200 overflow-hidden shadow-2xs hover:shadow-md transition-shadow flex flex-col">
+                <div className="h-40 w-full overflow-hidden bg-slate-100 relative">
+                  <img 
+                    src="/highlight-ambulance-network.jpg" 
+                    alt="District PHC Fully Functioned Ambulance System" 
+                    className="w-full h-full object-cover"
+                  />
+                  <span className="absolute top-2 left-2 bg-[#064e3b] text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
+                    108 Emergency System
+                  </span>
+                </div>
+                <div className="p-3 flex flex-col flex-1 justify-between border-t border-[#f37021]">
+                  <div>
+                    <h5 className="text-xs font-black text-[#064e3b]">जिला प्राथमिक स्वास्थ्य केंद्रों में सुसज्जित 108 एम्बुलेंस प्रणाली</h5>
+                    <p className="text-[10.5px] text-slate-600 mt-1 font-medium leading-relaxed">
+                      24/7 लाइफ-सपोर्ट युक्त एम्बुलेंस नेटवर्क द्वारा ब्लॉक स्तरीय PHC को सीधे जिला अस्पतालों से जोड़ा गया है।
+                    </p>
+                  </div>
+                  <div className="text-[10px] font-bold text-emerald-700 mt-2">✓ Fully Functioned Ambulance Fleet</div>
+                </div>
+              </div>
+
+              {/* Card 2 */}
+              <div className="bg-white rounded-xl border border-emerald-200 overflow-hidden shadow-2xs hover:shadow-md transition-shadow flex flex-col">
+                <div className="h-40 w-full overflow-hidden bg-slate-100 relative">
+                  <img 
+                    src="/highlight-hospital-infra.webp" 
+                    alt="Large Infrastructure for Hospitals in Jharkhand" 
+                    className="w-full h-full object-cover"
+                  />
+                  <span className="absolute top-2 left-2 bg-[#064e3b] text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
+                    Hospital Infrastructure
+                  </span>
+                </div>
+                <div className="p-3 flex flex-col flex-1 justify-between border-t border-[#f37021]">
+                  <div>
+                    <h5 className="text-xs font-black text-[#064e3b]">अस्पताल अवसंरचना एवं नए आधुनिक वार्ड्स का विस्तार</h5>
+                    <p className="text-[10.5px] text-slate-600 mt-1 font-medium leading-relaxed">
+                      सदर अस्पताल रांची एवं जिला स्तर पर 500+ बेड, अत्याधुनिक आईसीयू, एनआईसीयू और डायलिसिस केंद्र क्रियाशील।
+                    </p>
+                  </div>
+                  <div className="text-[10px] font-bold text-emerald-700 mt-2">✓ Multi-Specialty Upgrades</div>
+                </div>
+              </div>
+
+              {/* Card 3 */}
+              <div className="bg-white rounded-xl border border-emerald-200 overflow-hidden shadow-2xs hover:shadow-md transition-shadow flex flex-col">
+                <div className="h-40 w-full overflow-hidden bg-slate-100 relative">
+                  <img 
+                    src="/highlight-senior-doctor-visit.jpg" 
+                    alt="Senior Doctor Visit in Jharkhand PHC" 
+                    className="w-full h-full object-cover"
+                  />
+                  <span className="absolute top-2 left-2 bg-[#064e3b] text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
+                    Specialist Mentorship
+                  </span>
+                </div>
+                <div className="p-3 flex flex-col flex-1 justify-between border-t border-[#f37021]">
+                  <div>
+                    <h5 className="text-xs font-black text-[#064e3b]">वरिष्ठ चिकित्सकों एवं विशेषज्ञों द्वारा प्राथमिक केंद्रों का दौरा</h5>
+                    <p className="text-[10.5px] text-slate-600 mt-1 font-medium leading-relaxed">
+                      वरिष्ठ डॉक्टरों द्वारा प्रखंड स्तर पर जाकर जटिल मरीजों का ऑन-ग्राउंड उपचार एवं मेडिकल ऑडिट।
+                    </p>
+                  </div>
+                  <div className="text-[10px] font-bold text-emerald-700 mt-2">✓ Clinical Governance</div>
+                </div>
+              </div>
+
+              {/* Card 4 */}
+              <div className="bg-white rounded-xl border border-emerald-200 overflow-hidden shadow-2xs hover:shadow-md transition-shadow flex flex-col">
+                <div className="h-40 w-full overflow-hidden bg-slate-100 relative">
+                  <img 
+                    src="/highlight-doctor-visit.webp" 
+                    alt="Regular Doctor Visit in PHC" 
+                    className="w-full h-full object-cover"
+                  />
+                  <span className="absolute top-2 left-2 bg-[#064e3b] text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
+                    Daily OPD
+                  </span>
+                </div>
+                <div className="p-3 flex flex-col flex-1 justify-between border-t border-[#f37021]">
+                  <div>
+                    <h5 className="text-xs font-black text-[#064e3b]">प्राथमिक स्वास्थ्य केंद्रों (PHC) में डॉक्टरों की नियमित उपस्थिति</h5>
+                    <p className="text-[10.5px] text-slate-600 mt-1 font-medium leading-relaxed">
+                      दैनिक ओपीडी, गर्भवती महिलाओं का प्रसवपूर्व परीक्षण और मुफ्त आवश्यक दवाओं का सतत वितरण।
+                    </p>
+                  </div>
+                  <div className="text-[10px] font-bold text-emerald-700 mt-2">✓ 100% Doctor Presence</div>
+                </div>
+              </div>
+
+              {/* Card 5 */}
+              <div className="bg-white rounded-xl border border-emerald-200 overflow-hidden shadow-2xs hover:shadow-md transition-shadow flex flex-col">
+                <div className="h-40 w-full overflow-hidden bg-slate-100 relative">
+                  <img 
+                    src="/highlight-department-surveillance.jpg" 
+                    alt="Regular Surveillance of PHC by Health Department" 
+                    className="w-full h-full object-cover"
+                  />
+                  <span className="absolute top-2 left-2 bg-[#064e3b] text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
+                    Quality Audit
+                  </span>
+                </div>
+                <div className="p-3 flex flex-col flex-1 justify-between border-t border-[#f37021]">
+                  <div>
+                    <h5 className="text-xs font-black text-[#064e3b]">स्वास्थ्य विभाग द्वारा PHC/CHC का नियमित फील्ड सर्विलांस</h5>
+                    <p className="text-[10.5px] text-slate-600 mt-1 font-medium leading-relaxed">
+                      वैक्सीन कोल्ड-चेन तापमान, बायो-मेडिकल वेस्ट और लैब परीक्षणों का राज्य स्तरीय औचक निरीक्षण।
+                    </p>
+                  </div>
+                  <div className="text-[10px] font-bold text-emerald-700 mt-2">✓ Strict Field Inspection</div>
+                </div>
+              </div>
+
+              {/* Card 6 */}
+              <div className="bg-white rounded-xl border border-emerald-200 overflow-hidden shadow-2xs hover:shadow-md transition-shadow flex flex-col">
+                <div className="h-40 w-full overflow-hidden bg-slate-100 relative">
+                  <img 
+                    src="/highlight-govt-meetings.jpg" 
+                    alt="Govt Meetings for Steps Toward Health in Jharkhand" 
+                    className="w-full h-full object-cover"
+                  />
+                  <span className="absolute top-2 left-2 bg-[#064e3b] text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
+                    State Health Policy
+                  </span>
+                </div>
+                <div className="p-3 flex flex-col flex-1 justify-between border-t border-[#f37021]">
+                  <div>
+                    <h5 className="text-xs font-black text-[#064e3b]">स्वास्थ्य सुधार हेतु उच्चस्तरीय सरकारी समीक्षा बैठकें</h5>
+                    <p className="text-[10.5px] text-slate-600 mt-1 font-medium leading-relaxed">
+                      स्वास्थ्य मंत्रालय द्वारा बजट आवंटन, नई योजनाओं के क्रियान्वयन और HealthGrid AI पर रणनीतिक निर्णय।
+                    </p>
+                  </div>
+                  <div className="text-[10px] font-bold text-emerald-700 mt-2">✓ Strategic Governance</div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
         </div>
 
       </main>
