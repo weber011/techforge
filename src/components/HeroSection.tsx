@@ -120,29 +120,30 @@ export default function HeroSection() {
       {/* Real Live News Ticker Just Below Navbar (Exact Government Marquee) */}
       <NewsTicker />
 
-      {/* Hero Presentation Section */}
-      <main className="w-full max-w-7xl mx-auto px-6 md:px-12 py-10 md:py-14 flex flex-col lg:flex-row items-center gap-10 lg:gap-14 relative z-10">
-        
-        {/* Left Column: Vision, Objectives & CTAs */}
-        <div className="flex-1 flex flex-col items-start max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/90 border border-emerald-300 text-[#064e3b] text-xs font-black tracking-wide uppercase mb-6 shadow-2xs">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#047857] animate-pulse"></span>
-            झारखंड स्वास्थ्य ग्रिड &bull; HEALTHGRID JHARKHAND
-          </div>
+      {/* Hero Presentation Section with Vivid Jharkhand Template Background */}
+      <div className="w-full jharkhand-hero-bg border-b border-emerald-100">
+        <main className="w-full max-w-7xl mx-auto px-6 md:px-12 py-10 md:py-16 flex flex-col lg:flex-row items-center gap-10 lg:gap-14 relative z-10">
           
-          <h1 className="text-4xl sm:text-5xl lg:text-[52px] font-black text-[#064e3b] tracking-tight leading-[1.12] mb-5">
-            Predict. Prepare. <br/>
-            <span className="text-[#047857] underline decoration-amber-400 decoration-wavy decoration-2">Redistribute. Save.</span>
-          </h1>
-          
-          <p className="text-base sm:text-lg text-slate-700 leading-relaxed mb-8 font-medium">
-            झारखंड के प्राथमिक स्वास्थ्य केंद्रों (PHC) और जिला अस्पतालों को जोड़ने वाला रीयल-टाइम स्वास्थ्य ग्रिड — <strong>72 घंटे पूर्व दवा संकट पूर्वानुमान</strong>, <strong>GIS आधारित नजदीकी सुविधा खोज</strong>, और <strong>स्वचालित इंटर-PHC दवा पुनर्वितरण</strong>।
-          </p>
-          
-          {/* Quick Access Portals Grid with Green & White Theme */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 w-full mb-8">
-            <Link 
-              href="/dashboard" 
+          {/* Left Column: Vision, Objectives & CTAs */}
+          <div className="flex-1 flex flex-col items-start max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/90 border border-emerald-300 text-[#064e3b] text-xs font-black tracking-wide uppercase mb-6 shadow-2xs">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#047857] animate-pulse"></span>
+              झारखंड स्वास्थ्य ग्रिड &bull; HEALTHGRID JHARKHAND
+            </div>
+            
+            <h1 className="text-4xl sm:text-5xl lg:text-[52px] font-black text-[#064e3b] tracking-tight leading-[1.12] mb-5">
+              Predict. Prepare. <br/>
+              <span className="text-[#047857]">Redistribute. Save.</span>
+            </h1>
+            
+            <p className="text-base sm:text-lg text-slate-800 leading-relaxed mb-8 font-semibold drop-shadow-xs">
+              झारखंड के प्राथमिक स्वास्थ्य केंद्रों (PHC) और जिला अस्पतालों को जोड़ने वाला रीयल-टाइम स्वास्थ्य ग्रिड — <strong>72 घंटे पूर्व दवा संकट पूर्वानुमान</strong>, <strong>GIS आधारित नजदीकी सुविधा खोज</strong>, और <strong>स्वचालित इंटर-PHC दवा पुनर्वितरण</strong>।
+            </p>
+            
+            {/* Quick Access Portals Grid with Green & White Theme */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 w-full mb-8">
+              <Link 
+                href="/dashboard" 
               className="p-4 bg-[#064e3b] text-white rounded-xl shadow-md hover:shadow-lg hover:bg-[#047857] transition-all flex flex-col justify-between group border border-emerald-700"
             >
               <div>
@@ -375,6 +376,7 @@ export default function HeroSection() {
         </div>
 
       </main>
+    </div>
 
       {/* "OUR LEADERSHIP" Section (Exact Replicas of Govt Dignitaries) */}
       <section className="w-full bg-emerald-50/60 border-t border-emerald-200 py-12 px-6 md:px-12 relative z-10">
