@@ -1,19 +1,29 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Activity, AlertTriangle, Building2, Package, Users, ShieldAlert, ArrowRight } from 'lucide-react';
+import { Activity, AlertTriangle, Building2, Package, ShieldAlert, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
+interface PhcItem {
+  id: string;
+  name: string;
+  district: string;
+  state: string;
+  type: string;
+  totalBeds: number;
+  riskScore: number;
+  activeAlertsCount: number;
+}
+
 export default function Dashboard() {
-  const [phcs, setPhcs] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [phcs, setPhcs] = useState<Array<PhcItem>>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Fetch real data from our Next.js API
     fetch('/api/phcs')
       .then(res => res.json())
       .then(data => {
-        if (data.success) {
+        if (data.success && Array.isArray(data.data)) {
           setPhcs(data.data);
         }
         setLoading(false);
@@ -24,10 +34,9 @@ export default function Dashboard() {
       });
   }, []);
 
-  // Calculate dynamic KPIs from the real data
   const totalFacilities = phcs.length;
   const criticalFacilities = phcs.filter(p => p.type === 'EMERGENCY' || p.riskScore > 80).length;
-  const activeAlerts = phcs.reduce((acc, curr) => acc + curr.activeAlertsCount, 0);
+  const activeAlerts = phcs.reduce((acc, curr) => acc + (curr.activeAlertsCount || 0), 0);
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
@@ -43,17 +52,21 @@ export default function Dashboard() {
           </div>
         </div>
         <nav className="hidden md:flex gap-6">
-          <span className="text-sm font-medium text-emerald-700 border-b-2 border-emerald-700 pb-1 cursor-pointer">Overview</span>
-          <span className="text-sm font-medium text-slate-500 hover:text-slate-800 cursor-pointer transition-colors">Inventory</span>
-          <span className="text-sm font-medium text-slate-500 hover:text-slate-800 cursor-pointer transition-colors">Resource Transfers</span>
-          <span className="text-sm font-medium text-slate-500 hover:text-slate-800 cursor-pointer transition-colors">AI Copilot</span>
+          <Link href="/dashboard" className="text-sm font-medium text-emerald-700 border-b-2 border-emerald-700 pb-1">
+            Overview
+          </Link>
+          <Link href="/simulator" className="text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors">
+            Emergency Simulator
+          </Link>
+          <Link href="/public" className="text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors">
+            Public Portal
+          </Link>
         </nav>
         <div className="flex items-center gap-4">
-          <div className="px-3 py-1.5 bg-red-50 border border-red-100 rounded-md flex items-center gap-2 cursor-pointer hover:bg-red-100 transition-colors">
+          <Link href="/simulator" className="px-3 py-1.5 bg-red-50 border border-red-100 rounded-md flex items-center gap-2 hover:bg-red-100 transition-colors">
             <ShieldAlert className="w-4 h-4 text-red-600" />
             <span className="text-sm font-semibold text-red-700">Emergency Mode</span>
-          </div>
-          <div className="w-9 h-9 rounded-full bg-slate-200 border-2 border-white shadow-sm"></div>
+          </Link>
         </div>
       </header>
 
@@ -97,7 +110,7 @@ export default function Dashboard() {
               <Package className="w-5 h-5 text-emerald-600" />
             </div>
             <div className="text-3xl font-bold text-slate-800">
-              {loading ? '...' : 3 /* Placeholder until transfer API is wired */}
+              {loading ? '...' : 3}
             </div>
           </div>
         </section>
@@ -109,7 +122,9 @@ export default function Dashboard() {
           <section className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
             <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
               <h2 className="text-base font-semibold text-slate-800">Network Facilities</h2>
-              <button className="text-sm font-medium text-emerald-700 hover:text-emerald-800">View Map</button>
+              <Link href="/public" className="text-sm font-medium text-emerald-700 hover:text-emerald-800">
+                Public Directory
+              </Link>
             </div>
             
             <div className="overflow-x-auto">
@@ -127,7 +142,7 @@ export default function Dashboard() {
                   {loading ? (
                     <tr><td colSpan={5} className="p-8 text-center text-slate-400">Loading network data...</td></tr>
                   ) : phcs.length === 0 ? (
-                    <tr><td colSpan={5} className="p-8 text-center text-slate-400">No facilities found. Run database seeder.</td></tr>
+                    <tr><td colSpan={5} className="p-8 text-center text-slate-400">No facilities found.</td></tr>
                   ) : (
                     phcs.slice(0, 8).map((phc) => (
                       <tr key={phc.id} className="hover:bg-slate-50/50 transition-colors group">
@@ -137,10 +152,11 @@ export default function Dashboard() {
                         </td>
                         <td className="px-5 py-4 text-sm text-slate-600">{phc.district}</td>
                         <td className="px-5 py-4">
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium 
-                            ${phc.type === 'NORMAL' ? 'bg-emerald-50 text-emerald-700' : 
-                              phc.type === 'EMERGENCY' ? 'bg-red-50 text-red-700' : 
-                              'bg-amber-50 text-amber-700'}`}>
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                            phc.type === 'NORMAL' ? 'bg-emerald-50 text-emerald-700' : 
+                            phc.type === 'EMERGENCY' ? 'bg-red-50 text-red-700' : 
+                            'bg-amber-50 text-amber-700'
+                          }`}>
                             {phc.type.replace('_', ' ')}
                           </span>
                         </td>
@@ -156,9 +172,9 @@ export default function Dashboard() {
                           </div>
                         </td>
                         <td className="px-5 py-4 text-right">
-                          <button className="text-slate-400 hover:text-emerald-700 p-1 rounded-md hover:bg-emerald-50 transition-colors">
+                          <Link href="/simulator" className="text-slate-400 hover:text-emerald-700 p-1 rounded-md hover:bg-emerald-50 transition-colors inline-block">
                             <ArrowRight className="w-4 h-4" />
-                          </button>
+                          </Link>
                         </td>
                       </tr>
                     ))
@@ -168,7 +184,7 @@ export default function Dashboard() {
             </div>
             {!loading && phcs.length > 8 && (
               <div className="p-4 border-t border-slate-100 text-center">
-                <button className="text-sm font-medium text-emerald-700 hover:text-emerald-800">View all facilities</button>
+                <span className="text-xs text-slate-500">Showing 8 of {phcs.length} facilities</span>
               </div>
             )}
           </section>
@@ -187,15 +203,12 @@ export default function Dashboard() {
                   <h3 className="text-sm font-semibold tracking-wide text-emerald-400 uppercase">AI Copilot</h3>
                 </div>
                 <p className="text-sm text-slate-300 leading-relaxed mb-4">
-                  "I've detected a projected stock-out of Paracetamol at Patna PHC 3 in 48 hours. Recommend transferring 500 units from Patna PHC 1."
+                  &ldquo;I have detected a projected stock-out of Paracetamol at Patna Sadar PHC within 48 hours. Recommend transferring 500 units from Danapur PHC.&rdquo;
                 </p>
                 <div className="flex gap-2">
-                  <button className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium py-2 rounded transition-colors shadow-sm">
-                    Review Transfer
-                  </button>
-                  <button className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium py-2 rounded transition-colors border border-slate-700">
-                    Ask Follow-up
-                  </button>
+                  <Link href="/simulator" className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium py-2 rounded text-center transition-colors shadow-sm">
+                    Simulate Crisis
+                  </Link>
                 </div>
               </div>
             </div>
@@ -208,14 +221,14 @@ export default function Dashboard() {
                   <AlertTriangle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
                   <div>
                     <h4 className="text-xs font-semibold text-red-800">Bed Capacity Critical</h4>
-                    <p className="text-xs text-red-600 mt-1">Lucknow PHC 2 has reached 95% occupancy.</p>
+                    <p className="text-xs text-red-600 mt-1">Lucknow Chinhat PHC has reached 95% occupancy.</p>
                   </div>
                 </div>
                 <div className="flex gap-3 items-start p-3 bg-amber-50/50 rounded-lg border border-amber-100">
                   <Package className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
                   <div>
                     <h4 className="text-xs font-semibold text-amber-800">Approaching Expiry</h4>
-                    <p className="text-xs text-amber-600 mt-1">200 units of Amoxicillin at Ranchi PHC 1 expiring in 14 days.</p>
+                    <p className="text-xs text-amber-600 mt-1">200 units of Amoxicillin at Ranchi Sadar PHC expiring in 14 days.</p>
                   </div>
                 </div>
               </div>
