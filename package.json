@@ -1,0 +1,10 @@
+{
+  "name": "healthgrid-ai",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix healthgrid-web",
+    "build": "npm run build --prefix healthgrid-web",
+    "start": "npm run start --prefix healthgrid-web"
+  }
+}

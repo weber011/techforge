@@ -29,9 +29,9 @@ export async function POST(req: Request) {
     });
 
     // 3. Score and rank candidates
-    const scoredCandidates = candidates.map(inventory => {
+    const scoredCandidates = candidates.map((inventory: any) => {
       let score = 100;
-      let reasons = [];
+      let reasons: string[] = [];
 
       // Penalty for being in a different district (simulated distance)
       if (inventory.phc.districtId !== targetPhc.districtId) {
@@ -62,8 +62,8 @@ export async function POST(req: Request) {
 
     // Sort by highest score first
     const rankedCandidates = scoredCandidates
-      .filter(c => c.score > 50) // Reject unsafe donors
-      .sort((a, b) => b.score - a.score);
+      .filter((c: any) => c.score > 50) // Reject unsafe donors
+      .sort((a: any, b: any) => b.score - a.score);
 
     if (rankedCandidates.length === 0) {
       return NextResponse.json({

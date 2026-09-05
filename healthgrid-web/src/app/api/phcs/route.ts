@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const phcs = await prisma.phc.findMany({
@@ -24,7 +26,7 @@ export async function GET() {
       }
     });
 
-    const formatted = phcs.map(p => ({
+    const formatted = phcs.map((p: any) => ({
       id: p.id,
       name: p.name,
       district: p.district.name,

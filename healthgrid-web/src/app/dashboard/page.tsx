@@ -137,10 +137,10 @@ export default function Dashboard() {
                         </td>
                         <td className="px-5 py-4 text-sm text-slate-600">{phc.district}</td>
                         <td className="px-5 py-4">
-                          <span className={\`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium 
-                            \${phc.type === 'NORMAL' ? 'bg-emerald-50 text-emerald-700' : 
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium 
+                            ${phc.type === 'NORMAL' ? 'bg-emerald-50 text-emerald-700' : 
                               phc.type === 'EMERGENCY' ? 'bg-red-50 text-red-700' : 
-                              'bg-amber-50 text-amber-700'}\`}>
+                              'bg-amber-50 text-amber-700'}`}>
                             {phc.type.replace('_', ' ')}
                           </span>
                         </td>
@@ -148,8 +148,8 @@ export default function Dashboard() {
                           <div className="flex items-center gap-2">
                             <div className="w-16 h-2 bg-slate-100 rounded-full overflow-hidden">
                               <div 
-                                className={\`h-full \${phc.riskScore > 75 ? 'bg-red-500' : phc.riskScore > 40 ? 'bg-amber-500' : 'bg-emerald-500'}\`} 
-                                style={{ width: \`\${phc.riskScore}%\` }}
+                                className={`h-full ${phc.riskScore > 75 ? 'bg-red-500' : phc.riskScore > 40 ? 'bg-amber-500' : 'bg-emerald-500'}`} 
+                                style={{ width: `${phc.riskScore}%` }}
                               ></div>
                             </div>
                             <span className="text-xs font-semibold text-slate-600">{Math.round(phc.riskScore)}</span>

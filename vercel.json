@@ -1,0 +1,5 @@
+{
+  "buildCommand": "cd healthgrid-web && npm run build",
+  "installCommand": "cd healthgrid-web && npm install",
+  "framework": "nextjs"
+}

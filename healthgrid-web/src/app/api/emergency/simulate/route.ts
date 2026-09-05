@@ -24,9 +24,9 @@ export async function POST(req: Request) {
     });
 
     // 2. Run simulation calculations
-    const simulationResults = phcs.map((phc) => {
+    const simulationResults = phcs.map((phc: any) => {
       let simulatedRisk = 0;
-      let cascadeEffects = [];
+      let cascadeEffects: string[] = [];
 
       // Base metrics
       let currentPatients = phc.patientFootfalls[0]?.totalPatients || 100;
@@ -82,15 +82,15 @@ export async function POST(req: Request) {
 
     // 3. Filter for impacted PHCs and sort by severity
     const impacted = simulationResults
-      .filter(r => r.cascadeEffects.length > 0 || r.status === 'CRITICAL' || r.status === 'HIGH')
-      .sort((a, b) => b.simulatedRisk - a.simulatedRisk);
+      .filter((r: any) => r.cascadeEffects.length > 0 || r.status === 'CRITICAL' || r.status === 'HIGH')
+      .sort((a: any, b: any) => b.simulatedRisk - a.simulatedRisk);
 
     // 4. Generate AI Recommendations based on the digital twin state
-    const recommendations = [];
+    const recommendations: string[] = [];
     if (impacted.length > 0) {
       recommendations.push("Activate Emergency State Logistics Protocol for District.");
       recommendations.push("Authorize inter-district medicine transfers prioritizing CRITICAL facilities.");
-      if (impacted.some(i => i.projectedBedOccupancy > 100)) {
+      if (impacted.some((i: any) => i.projectedBedOccupancy > 100)) {
         recommendations.push("Deploy mobile medical units and temporary beds to relieve bed pressure.");
       }
     }
