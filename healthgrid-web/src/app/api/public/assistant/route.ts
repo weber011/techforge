@@ -1,103 +1,112 @@
 import { NextResponse } from 'next/server';
-import Groq from 'groq-sdk';
-import { INITIAL_PHCS } from '@/lib/upstash';
+import { RANCHI_FACILITIES_MASTER } from '@/lib/ranchiData';
 
 export const dynamic = 'force-dynamic';
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY || 'gsk_placeholder_key_for_build',
-});
-
-// Format PHCs context for the AI prompt
-const phcDirectoryContext = INITIAL_PHCS.map(p => 
-  `• ${p.name} (${p.district}, ${p.state}) - Beds: ${p.totalBeds}, Status: ${p.type === 'EMERGENCY' ? '24/7 Emergency & Inpatient' : 'Standard Inpatient & OPD'}`
-).join('\n');
+function haversine(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
+  return parseFloat((R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1));
+}
 
 export async function POST(req: Request) {
   try {
-    const { messages } = await req.json();
+    const { messages, userLocation } = await req.json();
 
-    if (!messages || !Array.isArray(messages)) {
-      return NextResponse.json({ error: 'Messages array is required' }, { status: 400 });
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return NextResponse.json({ success: false, error: 'Messages are required' }, { status: 400 });
     }
 
-    const systemPrompt = {
-      role: 'system',
-      content: `You are the "HealthGrid Citizen Health AI Assistant", an empathetic, intelligent public healthcare advisor for citizens across India.
+    const latestUserMsg = messages[messages.length - 1]?.content || '';
+    const lower = latestUserMsg.toLowerCase();
 
-Your primary responsibilities:
-1. FACILITY FINDER: Help citizens locate the nearest Primary Health Center (PHC) across Bihar, Uttar Pradesh, and Jharkhand from the verified directory below.
-2. MINOR AILMENT & FIRST AID GUIDANCE: Provide helpful, safe, non-prescription home care advice for minor ailments (e.g. mild fever, seasonal flu, dehydration, heat stroke, minor cuts, indigestion, ORS usage).
-3. SAFETY & TRIAGE GUARDRAILS: Always remind citizens that you are an AI assistant and recommend visiting a doctor or the nearest PHC if symptoms are severe (e.g. high fever >102°F, breathlessness, chest discomfort, severe injury).
-4. TONE: Warm, caring, culturally aware, concise, and structured with bullet points.
+    // Check if AI API Key is available
+    const apiKey = process.env.GROQ_API_KEY || process.env.OPENAI_API_KEY;
 
-VERIFIED PHC DIRECTORY:
-${phcDirectoryContext}
+    let matchedFacilityIds: string[] = [];
 
-Keep responses helpful, structured, and easy to understand for any citizen.`
-    };
+    // Local Tool Calling / Backend Lookup
+    let relevantFacilities = RANCHI_FACILITIES_MASTER;
+    if (userLocation?.latitude && userLocation?.longitude) {
+      relevantFacilities = [...RANCHI_FACILITIES_MASTER]
+        .map(f => ({ ...f, dist: haversine(userLocation.latitude, userLocation.longitude, f.latitude, f.longitude) }))
+        .sort((a, b) => a.dist - b.dist);
+      matchedFacilityIds = relevantFacilities.slice(0, 3).map(f => f.facility_id);
+    } else {
+      matchedFacilityIds = ['RNC-DH-001', 'RNC-CHC-002', 'RNC-CHC-004'];
+    }
 
-    // If Groq API key is configured and not placeholder, call Groq LLM
-    if (process.env.GROQ_API_KEY && !process.env.GROQ_API_KEY.includes('placeholder')) {
+    if (!apiKey) {
+      // Deterministic Clinical & Facility Guidance without fake numbers
+      let reply = '';
+      if (lower.includes('ratu') || lower.includes('phc') || lower.includes('hospital') || lower.includes('near') || lower.includes('bed')) {
+        const top = relevantFacilities.slice(0, 3);
+        reply = `🏥 **Verified Ranchi Healthcare Facilities:**\n\n` +
+          top.map((f, i) => `${i+1}. **${f.facility_name}** (${f.facility_type})\n   📍 ${f.address}\n   📞 Contact: ${f.phone}\n   🩺 Services: ${f.services.slice(0, 3).join(', ')}`).join('\n\n') +
+          `\n\n*For medical emergencies, please dial **108**.*`;
+      } else if (lower.includes('fever') || lower.includes('headache') || lower.includes('cold')) {
+        reply = `🌡️ **First-Aid Advice for Mild Fever:**\n\n1. **Hydration:** Drink plenty of clean boiled water, ORS, and tender coconut water.\n2. **Rest:** Get adequate physical rest in a well-ventilated room.\n3. **Monitoring:** If temperature exceeds 101°F or persists over 48 hours, visit your nearest Primary Health Centre immediately.\n\n*Nearest Facility:* **${relevantFacilities[0].facility_name}** (${relevantFacilities[0].address}).`;
+      } else if (lower.includes('dehydration') || lower.includes('ors') || lower.includes('diarrhea')) {
+        reply = `💧 **Oral Rehydration Therapy (ORS) Guidance:**\n\n1. Dissolve 1 full ORS sachet in 1 Litre of clean drinking water.\n2. Sip 200-400ml after every loose stool.\n3. Free ORS packets are stocked at all government PHCs and Sub-Centres across Ranchi.\n\n*Nearest Centre:* **${relevantFacilities[0].facility_name}**.`;
+      } else {
+        reply = `Namaste! I am the **HealthGrid Citizen AI Assistant**.\n\nI can help you locate verified government healthcare facilities across Ranchi, check OPD timings, and provide first-aid guidance for mild symptoms.\n\n*Nearest available hospital:* **${relevantFacilities[0].facility_name}** (${relevantFacilities[0].address}). For urgent assistance, dial **108** (Ambulance) or **104** (Medical helpline).`;
+      }
+
+      return NextResponse.json({
+        success: true,
+        reply,
+        map_action: {
+          type: 'SHOW_FACILITIES',
+          facility_ids: matchedFacilityIds
+        }
+      });
+    }
+
+    // Call Groq / OpenAI LLM
+    try {
+      const { Groq } = await import('groq-sdk');
+      const groq = new Groq({ apiKey });
+
+      const systemPrompt = `You are HealthGrid Citizen AI Assistant for the Government of Jharkhand Health Department.
+Your job is to assist citizens in locating verified healthcare facilities (PHC, CHC, Sadar Hospital) across Ranchi and Jharkhand, and provide first-aid advice for mild symptoms.
+Available verified facilities in database:
+${RANCHI_FACILITIES_MASTER.map(f => `- ${f.facility_id}: ${f.facility_name} (${f.facility_type}) in ${f.block}, address: ${f.address}, phone: ${f.phone}, services: ${f.services.join(', ')}`).join('\n')}
+
+Always provide empathetic, accurate, and actionable guidance. Remind citizens to dial 108 for emergency ambulances.`;
+
       const response = await groq.chat.completions.create({
-        messages: [systemPrompt, ...messages] as any,
-        model: 'llama3-8b-8192',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...messages.map((m: any) => ({ role: m.role, content: m.content }))
+        ],
+        model: 'llama-3.3-70b-versatile',
         temperature: 0.3,
-        max_tokens: 600,
+        max_tokens: 500
       });
 
-      const reply = response.choices[0]?.message?.content || "I am here to assist you with finding your nearest health center or offering basic healthcare guidance.";
-      return NextResponse.json({ success: true, reply });
+      const reply = response.choices[0]?.message?.content || 'Verified healthcare services are available at your nearest PHC.';
+
+      return NextResponse.json({
+        success: true,
+        reply,
+        map_action: {
+          type: 'SHOW_FACILITIES',
+          facility_ids: matchedFacilityIds
+        }
+      });
+    } catch (llmErr) {
+      return NextResponse.json({
+        success: true,
+        reply: `🏥 **Nearest Health Facilities in Ranchi:**\n\n1. **${relevantFacilities[0].facility_name}** - ${relevantFacilities[0].address}\n2. **${relevantFacilities[1].facility_name}** - ${relevantFacilities[1].address}\n\n*Dial 108 for Emergency Ambulance Services.*`,
+        map_action: {
+          type: 'SHOW_FACILITIES',
+          facility_ids: matchedFacilityIds
+        }
+      });
     }
-
-    // Dynamic Intelligent Rule-Based Fallback if Groq key is pending
-    const userQuery = (messages[messages.length - 1]?.content || '').toLowerCase();
-    let reply = '';
-
-    if (userQuery.includes('patna') || userQuery.includes('bihar')) {
-      reply = `📍 **Recommended Facilities in Patna (Bihar):**\n\n` +
-        `1. **Patna Sadar PHC** (Patna Central) - 35 Inpatient Beds, 24/7 OPD\n` +
-        `2. **Danapur PHC** (Danapur Sub-division) - 40 Beds, Maternal & Child Care\n` +
-        `3. **Phulwari Sharif PHC** - 25 Beds, General Consultation\n\n` +
-        `💡 *Tip: For urgent emergency admissions, visit Patna Sadar PHC or Danapur PHC.*`;
-    } else if (userQuery.includes('lucknow') || userQuery.includes('varanasi') || userQuery.includes('up') || userQuery.includes('uttar pradesh')) {
-      reply = `📍 **Recommended Facilities in Uttar Pradesh:**\n\n` +
-        `1. **Hazratganj Urban PHC** (Lucknow Central) - 50 Inpatient Beds, Full Diagnostics\n` +
-        `2. **Chinhat PHC** (Lucknow) - 35 Beds, 24/7 Emergency Unit\n` +
-        `3. **Kashi Urban PHC** (Varanasi) - 40 Inpatient Beds\n\n` +
-        `🚑 *Emergency Helpline: 108 / 102*`;
-    } else if (userQuery.includes('ranchi') || userQuery.includes('dhanbad') || userQuery.includes('jharkhand')) {
-      reply = `📍 **Recommended Facilities in Jharkhand:**\n\n` +
-        `1. **Ranchi Sadar PHC** (Ranchi Central) - 45 Inpatient Beds, Emergency & Vaccine Center\n` +
-        `2. **Kanke PHC** (Ranchi) - 35 Inpatient Beds\n` +
-        `3. **Dhanbad Urban PHC** (Dhanbad) - 40 Beds, 24/7 OPD\n\n` +
-        `💡 *All primary health centers provide free essential medicines and doctor consultations.*`;
-    } else if (userQuery.includes('fever') || userQuery.includes('cold') || userQuery.includes('flu') || userQuery.includes('cough')) {
-      reply = `🩺 **Home Care & First Aid Advice for Mild Fever / Cold:**\n\n` +
-        `• **Hydration**: Drink plenty of warm fluids, coconut water, or warm soup.\n` +
-        `• **Rest**: Take adequate rest to support your immune recovery.\n` +
-        `• **Temperature Monitoring**: Keep a record of your temperature every 4-6 hours.\n` +
-        `• **Sponge**: If fever is elevated, use a room-temperature damp cloth sponge on forehead.\n\n` +
-        `⚠️ **When to visit your nearest PHC:**\n` +
-        `If fever exceeds 102°F (38.9°C), persists for more than 48 hours, or is accompanied by severe shivering or breathing difficulty, please visit your nearest PHC immediately.`;
-    } else if (userQuery.includes('dehydration') || userQuery.includes('diarrhea') || userQuery.includes('vomit') || userQuery.includes('ors')) {
-      reply = `💧 **Dehydration & Electrolyte Recovery Protocol:**\n\n` +
-        `• **Oral Rehydration Salts (ORS)**: Mix 1 sachet of ORS in 1 Liter of clean drinking water. Drink small sips regularly.\n` +
-        `• **Fluids**: Have light fluids like rice water, dal soup, and coconut water.\n` +
-        `• **Avoid**: Avoid caffeinated, fizzy, or overly sugary drinks.\n\n` +
-        `⚠️ *Visit your nearest PHC immediately if you notice extreme dizziness, dry mouth, or inability to retain fluids.*`;
-    } else {
-      reply = `👋 **Hello! I am your HealthGrid Public Health AI Assistant.**\n\n` +
-        `I can help you with:\n` +
-        `• 🏥 **Locating Nearest PHC**: Tell me your city/district (e.g., *Patna, Lucknow, Ranchi, Gaya, Varanasi, Dhanbad*).\n` +
-        `• 💊 **First Aid & Health Guidance**: Ask for home remedies for mild fever, dehydration, cough, or general wellness.\n` +
-        `• 🚑 **Emergency Facility Readiness**: Inquire about 24/7 bed availability.\n\n` +
-        `*How can I assist your health today?*`;
-    }
-
-    return NextResponse.json({ success: true, reply });
   } catch (error: any) {
-    console.error('Public Assistant Error:', error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'AI Assistant is currently unavailable.' }, { status: 500 });
   }
 }

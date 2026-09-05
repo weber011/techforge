@@ -84,36 +84,29 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* Portal Navigation & Direct Access */}
+        {/* Public Citizen Navigation */}
         <nav className="flex items-center gap-2 sm:gap-3 text-xs font-semibold">
-          <Link 
-            href="/dashboard" 
-            className="px-3.5 py-2 text-slate-700 hover:text-[#064e3b] hover:bg-emerald-50 rounded-lg transition-colors hidden md:inline-flex items-center gap-1.5 border border-transparent hover:border-emerald-200"
-          >
-            <ShieldAlert className="w-4 h-4 text-[#064e3b]" />
-            <span>Command Center</span>
-          </Link>
-          <Link 
-            href="/phc" 
-            className="px-3.5 py-2 text-slate-700 hover:text-[#064e3b] hover:bg-emerald-50 rounded-lg transition-colors hidden md:inline-flex items-center gap-1.5 border border-transparent hover:border-emerald-200"
-          >
-            <Building2 className="w-4 h-4 text-emerald-700" />
-            <span>PHC Portal</span>
-          </Link>
           <Link 
             href="/public" 
             className="px-3.5 py-2 text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg transition-colors inline-flex items-center gap-1.5 font-bold shadow-2xs"
           >
             <HeartPulse className="w-4 h-4 text-emerald-700" />
-            <span>Citizen Portal</span>
+            <span>नागरिक स्वास्थ्य पोर्टल</span>
           </Link>
           <Link 
-            href="/dashboard" 
-            className="px-4 py-2 bg-[#064e3b] hover:bg-[#047857] text-white rounded-lg transition-colors shadow-sm font-bold inline-flex items-center gap-1.5 border border-emerald-900"
+            href="/public" 
+            className="px-3.5 py-2 text-slate-700 hover:text-[#064e3b] hover:bg-emerald-50 rounded-lg transition-colors hidden sm:inline-flex items-center gap-1.5 border border-transparent hover:border-emerald-200 font-bold"
           >
-            <Lock className="w-3.5 h-3.5 text-amber-300" />
-            <span>Official Login</span>
+            <Activity className="w-4 h-4 text-emerald-700" />
+            <span>AI स्वास्थ्य मित्र</span>
           </Link>
+          <a 
+            href="tel:108" 
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors shadow-sm font-bold inline-flex items-center gap-1.5 border border-red-700"
+          >
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-300" />
+            <span>108 आपातकालीन</span>
+          </a>
         </nav>
       </header>
 
@@ -140,53 +133,53 @@ export default function HeroSection() {
               झारखंड के प्राथमिक स्वास्थ्य केंद्रों (PHC) और जिला अस्पतालों को जोड़ने वाला रीयल-टाइम स्वास्थ्य ग्रिड — <strong>72 घंटे पूर्व दवा संकट पूर्वानुमान</strong>, <strong>GIS आधारित नजदीकी सुविधा खोज</strong>, और <strong>स्वचालित इंटर-PHC दवा पुनर्वितरण</strong>।
             </p>
             
-            {/* Quick Access Portals Grid with Green & White Theme */}
+            {/* 100% Public-Oriented Quick Access Cards with Green & White Theme */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 w-full mb-8">
               <Link 
-                href="/dashboard" 
-              className="p-4 bg-[#064e3b] text-white rounded-xl shadow-md hover:shadow-lg hover:bg-[#047857] transition-all flex flex-col justify-between group border border-emerald-700"
-            >
-              <div>
-                <div className="flex items-center justify-between text-emerald-200 mb-2">
-                  <ShieldAlert className="w-5 h-5 text-amber-300" />
-                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                href="/public" 
+                className="p-4 bg-[#064e3b] text-white rounded-xl shadow-md hover:shadow-lg hover:bg-[#047857] transition-all flex flex-col justify-between group border border-emerald-700"
+              >
+                <div>
+                  <div className="flex items-center justify-between text-emerald-200 mb-2">
+                    <MapPin className="w-5 h-5 text-amber-300" />
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                  <div className="text-xs font-black text-white">नजदीकी स्वास्थ्य केंद्र</div>
+                  <div className="text-[11px] font-bold text-emerald-100">Find Nearest PHC / CHC</div>
+                  <div className="text-[10px] text-emerald-200 mt-1">Live Bed Capacity &amp; OPD</div>
                 </div>
-                <div className="text-xs font-black text-white">कमान केंद्र</div>
-                <div className="text-[11px] font-bold text-emerald-100">Command Radar</div>
-                <div className="text-[10px] text-emerald-200 mt-1">72h AI Shortage Radar</div>
-              </div>
-            </Link>
+              </Link>
 
-            <Link 
-              href="/phc" 
-              className="p-4 bg-[#047857] text-white rounded-xl shadow-md hover:shadow-lg hover:bg-[#059669] transition-all flex flex-col justify-between group border border-emerald-600"
-            >
-              <div>
-                <div className="flex items-center justify-between text-emerald-200 mb-2">
-                  <Building2 className="w-5 h-5 text-white" />
-                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <Link 
+                href="/public" 
+                className="p-4 bg-[#047857] text-white rounded-xl shadow-md hover:shadow-lg hover:bg-[#059669] transition-all flex flex-col justify-between group border border-emerald-600"
+              >
+                <div>
+                  <div className="flex items-center justify-between text-emerald-200 mb-2">
+                    <HeartPulse className="w-5 h-5 text-white" />
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                  <div className="text-xs font-black text-white">AI स्वास्थ्य मित्र</div>
+                  <div className="text-[11px] font-bold text-emerald-100">Citizen Health AI</div>
+                  <div className="text-[10px] text-emerald-200 mt-1">24x7 Symptom &amp; Remedy Guide</div>
                 </div>
-                <div className="text-xs font-black text-white">PHC स्टाफ पोर्टल</div>
-                <div className="text-[11px] font-bold text-emerald-100">Staff Inventory</div>
-                <div className="text-[10px] text-emerald-200 mt-1">Peer Transfer Requisition</div>
-              </div>
-            </Link>
+              </Link>
 
-            <Link 
-              href="/public" 
-              className="p-4 bg-white/95 border-2 border-emerald-600 text-[#064e3b] rounded-xl shadow-md hover:shadow-lg hover:bg-emerald-50 transition-all flex flex-col justify-between group"
-            >
-              <div>
-                <div className="flex items-center justify-between text-[#047857] mb-2">
-                  <HeartPulse className="w-5 h-5 text-[#047857]" />
-                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <Link 
+                href="/public" 
+                className="p-4 bg-white/95 border-2 border-emerald-600 text-[#064e3b] rounded-xl shadow-md hover:shadow-lg hover:bg-emerald-50 transition-all flex flex-col justify-between group"
+              >
+                <div>
+                  <div className="flex items-center justify-between text-[#047857] mb-2">
+                    <Activity className="w-5 h-5 text-[#047857]" />
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                  <div className="text-xs font-black text-[#064e3b]">आपातकालीन सहायता</div>
+                  <div className="text-[11px] font-bold text-emerald-800">108 / 104 Helplines</div>
+                  <div className="text-[10px] text-slate-600 mt-1">Direct Emergency Ambulance</div>
                 </div>
-                <div className="text-xs font-black text-[#064e3b]">नागरिक पोर्टल</div>
-                <div className="text-[11px] font-bold text-emerald-800">Public Portal</div>
-                <div className="text-[10px] text-slate-600 mt-1">Nearest PHC &amp; Health AI</div>
-              </div>
-            </Link>
-          </div>
+              </Link>
+            </div>
 
           {/* Verification Badges */}
           <div className="flex flex-wrap items-center gap-3 text-xs">
@@ -356,10 +349,10 @@ export default function HeroSection() {
                 </div>
               </div>
               <Link
-                href="/dashboard"
+                href="/public"
                 className="px-3.5 py-1.5 bg-[#064e3b] hover:bg-[#047857] text-white font-bold rounded-lg text-[11px] shrink-0 transition-colors shadow-2xs"
               >
-                Inspect ➔
+                सुविधा देखें ➔
               </Link>
             </div>
 
@@ -378,7 +371,7 @@ export default function HeroSection() {
       </main>
     </div>
 
-      {/* "OUR LEADERSHIP" Section (Exact Replicas of Govt Dignitaries) */}
+      {/* OUR LEADERSHIP Section - 4 Separate Individual Cropped Portrait Images */}
       <section className="w-full bg-emerald-50/60 border-t border-emerald-200 py-12 px-6 md:px-12 relative z-10">
         <div className="max-w-7xl mx-auto flex flex-col gap-6">
           
@@ -391,16 +384,16 @@ export default function HeroSection() {
             <p className="text-xs text-emerald-900 font-semibold mt-2">झारखंड सरकार &bull; स्वास्थ्य, चिकित्सा शिक्षा एवं परिवार कल्याण विभाग</p>
           </div>
 
-          {/* Dignitaries Grid */}
+          {/* Dignitaries Grid with Individual Photos */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             
             {/* Card 1: Hon'ble Chief Minister */}
             <div className="bg-white border-2 border-emerald-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
-              <div className="relative w-full h-48 bg-gradient-to-b from-emerald-100 to-emerald-50 overflow-hidden flex items-center justify-center">
+              <div className="relative w-full h-52 bg-gradient-to-b from-emerald-100 to-emerald-50 overflow-hidden flex items-center justify-center p-2">
                 <img 
-                  src="/leadership-banner.png" 
+                  src="/leader-hemant-soren.png" 
                   alt="Shri Hemant Soren" 
-                  className="w-full h-full object-cover object-left"
+                  className="max-h-full max-w-full object-contain drop-shadow-md rounded-lg"
                 />
               </div>
               <div className="p-4 flex flex-col text-center border-t-2 border-[#f37021]">
@@ -412,12 +405,11 @@ export default function HeroSection() {
 
             {/* Card 2: Hon'ble Health Minister */}
             <div className="bg-white border-2 border-emerald-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
-              <div className="relative w-full h-48 bg-slate-100 overflow-hidden flex items-center justify-center">
+              <div className="relative w-full h-52 bg-gradient-to-b from-emerald-100 to-emerald-50 overflow-hidden flex items-center justify-center p-2">
                 <img 
-                  src="/leadership-banner.png" 
+                  src="/leader-irfan-ansari.png" 
                   alt="Dr. Irfan Ansari" 
-                  className="w-full h-full object-cover"
-                  style={{ objectPosition: '33% 50%' }}
+                  className="max-h-full max-w-full object-contain drop-shadow-md rounded-lg"
                 />
               </div>
               <div className="p-4 flex flex-col text-center border-t-2 border-[#f37021]">
@@ -429,12 +421,11 @@ export default function HeroSection() {
 
             {/* Card 3: Additional Chief Secretary */}
             <div className="bg-white border-2 border-emerald-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
-              <div className="relative w-full h-48 bg-slate-100 overflow-hidden flex items-center justify-center">
+              <div className="relative w-full h-52 bg-gradient-to-b from-emerald-100 to-emerald-50 overflow-hidden flex items-center justify-center p-2">
                 <img 
-                  src="/leadership-banner.png" 
+                  src="/leader-ajay-singh.png" 
                   alt="Shri. Ajay Kumar Singh, IAS" 
-                  className="w-full h-full object-cover"
-                  style={{ objectPosition: '66% 50%' }}
+                  className="max-h-full max-w-full object-contain drop-shadow-md rounded-lg"
                 />
               </div>
               <div className="p-4 flex flex-col text-center border-t-2 border-[#f37021]">
@@ -446,11 +437,11 @@ export default function HeroSection() {
 
             {/* Card 4: Mission Director NHM */}
             <div className="bg-white border-2 border-emerald-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
-              <div className="relative w-full h-48 bg-slate-100 overflow-hidden flex items-center justify-center">
+              <div className="relative w-full h-52 bg-gradient-to-b from-emerald-100 to-emerald-50 overflow-hidden flex items-center justify-center p-2">
                 <img 
-                  src="/leadership-banner.png" 
+                  src="/leader-shashi-jha.png" 
                   alt="Mr. Shashi Prakash Jha, IAS" 
-                  className="w-full h-full object-cover object-right"
+                  className="max-h-full max-w-full object-contain drop-shadow-md rounded-lg"
                 />
               </div>
               <div className="p-4 flex flex-col text-center border-t-2 border-[#f37021]">
@@ -470,14 +461,13 @@ export default function HeroSection() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex flex-col gap-1">
             <div className="font-bold text-sm text-amber-300">स्वास्थ्य एवं परिवार कल्याण विभाग &bull; झारखंड सरकार</div>
-            <div className="text-emerald-100 text-[11px]">HealthGrid AI Jharkhand: Public Healthcare Logistics &amp; Emergency Supply Chain Resilience Platform</div>
+            <div className="text-emerald-100 text-[11px]">HealthGrid AI Jharkhand: Citizen Healthcare Services &amp; Emergency Supply Chain Resilience</div>
             <div className="text-emerald-300 text-[10px] mt-1">आपातकालीन एम्बुलेंस: 108 &bull; स्वास्थ्य हेल्पलाइन: 104 &bull; रांची जिला नियंत्रण कक्ष: 0651-2446666</div>
           </div>
           <div className="flex items-center gap-6 text-emerald-100 text-[11px] font-semibold">
-            <Link href="/public" className="hover:text-white hover:underline">Citizen Portal</Link>
-            <Link href="/dashboard" className="hover:text-white hover:underline">Command Center</Link>
-            <Link href="/phc" className="hover:text-white hover:underline">PHC Requisition</Link>
-            <a href="https://github.com/weber011/techforge" target="_blank" rel="noreferrer" className="hover:text-white hover:underline">GitHub</a>
+            <Link href="/public" className="hover:text-white hover:underline">नागरिक पोर्टल (Citizen Portal)</Link>
+            <a href="tel:108" className="hover:text-white hover:underline">108 आपातकालीन</a>
+            <a href="tel:104" className="hover:text-white hover:underline">104 हेल्पलाइन</a>
           </div>
         </div>
       </footer>
