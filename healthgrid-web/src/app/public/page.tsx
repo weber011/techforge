@@ -15,6 +15,146 @@ interface Message {
   content: string;
 }
 
+function formatInlineText(text: string) {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      const boldContent = part.slice(2, -2);
+      return <strong key={i} className="font-bold text-[#064e3b]">{boldContent}</strong>;
+    }
+    if (part.includes('108') || part.includes('104')) {
+      return (
+        <span key={i}>
+          {part.split(/(108|104)/g).map((sub, j) => {
+            if (sub === '108') return <span key={j} className="font-black text-red-600 bg-red-50 px-1 py-0.5 rounded border border-red-200">108</span>;
+            if (sub === '104') return <span key={j} className="font-black text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded border border-emerald-200">104</span>;
+            return sub;
+          })}
+        </span>
+      );
+    }
+    return part;
+  });
+}
+
+function ChatBubbleContent({ content, role }: { content: string; role: 'user' | 'assistant' }) {
+  if (role === 'user') {
+    return <div className="leading-relaxed">{content}</div>;
+  }
+
+  const cleanText = content.replace(/<br\s*\/?>/gi, '\n');
+  const lines = cleanText.split('\n');
+  const hasTable = lines.some(l => l.trim().startsWith('|') && l.trim().endsWith('|'));
+
+  if (hasTable) {
+    const nonTableLines: string[] = [];
+    const tableRows: string[][] = [];
+    let inTable = false;
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+        inTable = true;
+        if (!trimmed.match(/^\|[\s\-:|]+\|$/)) {
+          const cells = trimmed
+            .split('|')
+            .slice(1, -1)
+            .map(c => c.trim());
+          if (cells.length > 0 && cells.some(c => c.length > 0)) {
+            tableRows.push(cells);
+          }
+        }
+      } else {
+        if (inTable && trimmed === '') {
+          inTable = false;
+        } else {
+          nonTableLines.push(line);
+        }
+      }
+    }
+
+    const headers = tableRows.length > 0 ? tableRows[0] : [];
+    const dataRows = tableRows.slice(1);
+
+    return (
+      <div className="flex flex-col gap-2.5">
+        {nonTableLines.filter(l => l.trim()).map((l, i) => (
+          <div key={i} className="leading-relaxed text-slate-800">
+            {formatInlineText(l)}
+          </div>
+        ))}
+
+        {dataRows.length > 0 && (
+          <div className="flex flex-col gap-2 my-1">
+            {dataRows.map((row, rIdx) => (
+              <div key={rIdx} className="bg-emerald-50/80 border border-emerald-200 rounded-xl p-2.5 text-[11px] shadow-2xs flex flex-col gap-1">
+                {row.map((cell, cIdx) => (
+                  <div key={cIdx} className="flex flex-col sm:flex-row sm:justify-between py-0.5 border-b border-emerald-100 last:border-0 gap-0.5">
+                    {headers[cIdx] && (
+                      <span className="font-bold text-[#064e3b] text-[10px] shrink-0">
+                        {headers[cIdx]}:
+                      </span>
+                    )}
+                    <span className="text-slate-800 text-left sm:text-right font-medium">
+                      {formatInlineText(cell)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-1.5 leading-relaxed text-slate-800">
+      {lines.map((line, idx) => {
+        const trimmed = line.trim();
+        if (!trimmed) return <div key={idx} className="h-0.5" />;
+
+        if (trimmed.startsWith('### ') || trimmed.startsWith('## ') || trimmed.startsWith('# ')) {
+          const hText = trimmed.replace(/^#+\s*/, '');
+          return (
+            <div key={idx} className="font-black text-[#064e3b] text-xs pt-1 border-b border-emerald-100 pb-0.5">
+              {formatInlineText(hText)}
+            </div>
+          );
+        }
+
+        if (trimmed.startsWith('• ') || trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
+          const bText = trimmed.replace(/^[•*-]\s*/, '');
+          return (
+            <div key={idx} className="flex items-start gap-1.5 pl-0.5 text-[11.5px]">
+              <span className="text-[#047857] font-bold mt-0.5">•</span>
+              <span className="flex-1 text-slate-700">{formatInlineText(bText)}</span>
+            </div>
+          );
+        }
+
+        const numMatch = trimmed.match(/^(\d+)\.\s+(.*)$/);
+        if (numMatch) {
+          return (
+            <div key={idx} className="flex items-start gap-1.5 pl-0.5 text-[11.5px]">
+              <span className="font-black text-[#064e3b] bg-emerald-100 px-1 rounded text-[10px] shrink-0 mt-0.5">
+                {numMatch[1]}
+              </span>
+              <span className="flex-1 text-slate-700">{formatInlineText(numMatch[2])}</span>
+            </div>
+          );
+        }
+
+        return (
+          <div key={idx} className="text-[11.5px] text-slate-800">
+            {formatInlineText(line)}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function PublicPortal() {
   const [facilities, setFacilities] = useState<MapFacility[]>([]);
   const [loadingFacilities, setLoadingFacilities] = useState(true);
@@ -658,12 +798,12 @@ export default function PublicPortal() {
                     AI
                   </div>
                 )}
-                <div className={`p-3 rounded-2xl max-w-[80%] whitespace-pre-wrap leading-relaxed ${
+                <div className={`p-3 rounded-2xl max-w-[85%] leading-relaxed ${
                   m.role === 'user' 
-                    ? 'bg-[#064e3b] text-white rounded-br-none font-medium' 
-                    : 'bg-white text-slate-800 rounded-bl-none border border-slate-200 font-medium shadow-2xs'
+                    ? 'bg-[#064e3b] text-white rounded-br-none font-medium text-xs' 
+                    : 'bg-white text-slate-800 rounded-bl-none border border-emerald-200/80 font-normal shadow-xs'
                 }`}>
-                  {m.content}
+                  <ChatBubbleContent content={m.content} role={m.role} />
                 </div>
               </div>
             ))}
