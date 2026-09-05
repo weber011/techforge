@@ -15,6 +15,8 @@ export interface EmergencyEvent {
   description: string;
   nearest_facility_id: string;
   assigned_facility_id?: string;
+  contact_phone?: string;
+  citizen_name?: string;
   resolution_notes?: string;
   resolved_at?: string;
   updated_at: string;
@@ -51,6 +53,8 @@ if (!globalForEmergency.__HEALTHGRID_EMERGENCIES__) {
       severity: 'CRITICAL',
       description: 'Acute respiratory distress reported near Ratu Road',
       nearest_facility_id: 'RNC-CHC-002',
+      contact_phone: '+91 94311 02845',
+      citizen_name: 'Rajesh Kumar',
       acknowledged_at: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
       acknowledged_by: 'govtjharkhand123 (Govt Command Officer)',
       updated_at: new Date().toISOString()
@@ -83,6 +87,8 @@ export function createEmergencyEvent(data: {
   description?: string;
   nearest_facility_id: string;
   user_id?: string;
+  contact_phone?: string;
+  citizen_name?: string;
 }): EmergencyEvent {
   const eventId = 'EMG-' + Math.floor(100000 + Math.random() * 900000);
   const now = new Date().toISOString();
@@ -100,6 +106,8 @@ export function createEmergencyEvent(data: {
     severity: data.severity || 'CRITICAL',
     description: data.description || 'Emergency medical assistance requested by citizen.',
     nearest_facility_id: data.nearest_facility_id,
+    contact_phone: data.contact_phone || 'Not Provided',
+    citizen_name: data.citizen_name || 'Citizen Caller',
     updated_at: now
   };
 

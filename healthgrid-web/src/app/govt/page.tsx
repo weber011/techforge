@@ -187,7 +187,7 @@ export default function GovtPortal() {
                   required
                   value={govId}
                   onChange={(e) => setGovId(e.target.value)}
-                  placeholder="Enter Govt ID (e.g. govtjharkhand123)"
+                  placeholder="Enter Official Govt ID"
                   className="w-full text-xs p-3 bg-slate-50 border border-emerald-200 rounded-xl focus:bg-white focus:border-[#064e3b] outline-none font-semibold text-slate-800"
                 />
               </div>
@@ -206,9 +206,12 @@ export default function GovtPortal() {
                 />
               </div>
 
-              <div className="bg-emerald-50/70 p-3 rounded-xl border border-emerald-200 text-[11px] text-emerald-900 font-medium">
-                🔒 Official Credentials: <br/>
-                <span className="font-bold text-[#064e3b]">ID:</span> <code className="bg-white px-1.5 py-0.5 rounded border border-emerald-200 font-bold">govtjharkhand123</code> &bull; <span className="font-bold text-[#064e3b]">Pass:</span> <code className="bg-white px-1.5 py-0.5 rounded border border-emerald-200 font-bold">aman123</code>
+              <div className="flex items-center justify-between text-[11px] text-slate-500 font-medium px-1">
+                <span className="flex items-center gap-1">
+                  <Lock className="w-3 h-3 text-emerald-600" />
+                  256-Bit SSL Encrypted
+                </span>
+                <span className="text-emerald-700 font-semibold">NIC Jharkhand</span>
               </div>
 
               <button
@@ -289,6 +292,25 @@ export default function GovtPortal() {
                   {RANCHI_FACILITIES_MASTER.find(f => f.facility_id === activePopupAlert.nearest_facility_id)?.facility_name || activePopupAlert.nearest_facility_id}
                 </span>
               </div>
+              <div className="flex justify-between">
+                <span className="text-slate-600">Caller Phone:</span>
+                {activePopupAlert.contact_phone && activePopupAlert.contact_phone !== 'Not Provided' ? (
+                  <a 
+                    href={`tel:${activePopupAlert.contact_phone}`} 
+                    className="font-black text-red-700 hover:underline bg-red-100 px-2 py-0.5 rounded text-xs tracking-wider"
+                  >
+                    📞 {activePopupAlert.contact_phone}
+                  </a>
+                ) : (
+                  <span className="font-bold text-slate-500">Not Provided</span>
+                )}
+              </div>
+              {activePopupAlert.citizen_name && activePopupAlert.citizen_name !== 'Citizen Caller' && (
+                <div className="flex justify-between">
+                  <span className="text-slate-600">Patient / Caller:</span>
+                  <span className="font-bold text-slate-800">{activePopupAlert.citizen_name}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span className="text-slate-600">Severity:</span>
                 <span className="font-black text-red-600 bg-red-100 px-2 py-0.5 rounded text-[10px]">
@@ -465,6 +487,7 @@ export default function GovtPortal() {
                   <tr className="border-b border-slate-200 text-slate-600 font-black uppercase text-[10px]">
                     <th className="py-2.5 px-3">Event ID</th>
                     <th className="py-2.5 px-2">Time</th>
+                    <th className="py-2.5 px-2">Caller Phone</th>
                     <th className="py-2.5 px-2">Coordinates</th>
                     <th className="py-2.5 px-2">Nearest PHC</th>
                     <th className="py-2.5 px-2">Status</th>
@@ -479,6 +502,15 @@ export default function GovtPortal() {
                       </td>
                       <td className="py-3 px-2 text-slate-500 font-medium text-[11px]">
                         {new Date(emg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </td>
+                      <td className="py-3 px-2 text-[11px]">
+                        {emg.contact_phone && emg.contact_phone !== 'Not Provided' ? (
+                          <a href={`tel:${emg.contact_phone}`} className="font-bold text-red-700 hover:underline">
+                            📞 {emg.contact_phone}
+                          </a>
+                        ) : (
+                          <span className="text-slate-400 font-medium">N/A</span>
+                        )}
                       </td>
                       <td className="py-3 px-2 font-mono text-[11px]">
                         {Number(emg.latitude).toFixed(3)}°N, {Number(emg.longitude).toFixed(3)}°E

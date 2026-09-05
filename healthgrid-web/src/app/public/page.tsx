@@ -35,6 +35,8 @@ export default function PublicPortal() {
   const [emergencyModalOpen, setEmergencyModalOpen] = useState(false);
   const [emergencySubmitting, setEmergencySubmitting] = useState(false);
   const [emergencySeverity, setEmergencySeverity] = useState<'CRITICAL' | 'HIGH'>('CRITICAL');
+  const [emergencyPhone, setEmergencyPhone] = useState('');
+  const [emergencyName, setEmergencyName] = useState('');
   const [emergencyDescription, setEmergencyDescription] = useState('');
   const [activeEmergency, setActiveEmergency] = useState<any | null>(null);
 
@@ -162,7 +164,9 @@ export default function PublicPortal() {
           longitude: lng,
           location_accuracy: acc,
           severity: emergencySeverity,
-          description: emergencyDescription || 'Citizen emergency medical assistance request.'
+          description: emergencyDescription || 'Citizen emergency medical assistance request.',
+          contact_phone: emergencyPhone.trim() || 'Not Provided',
+          citizen_name: emergencyName.trim() || 'Citizen Caller'
         })
       });
 
@@ -558,14 +562,41 @@ export default function PublicPortal() {
               </div>
             </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-red-700 flex items-center gap-1">
+                  <span>संपर्क नंबर (Caller Phone Number)</span>
+                  <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  placeholder="e.g. 9876543210"
+                  value={emergencyPhone}
+                  onChange={(e) => setEmergencyPhone(e.target.value)}
+                  className="text-xs p-3 bg-red-50/50 border border-red-300 rounded-xl font-bold outline-none focus:border-red-600 focus:bg-white text-slate-800"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-slate-700">मरीज का नाम (Patient Name)</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Ramesh Mahto"
+                  value={emergencyName}
+                  onChange={(e) => setEmergencyName(e.target.value)}
+                  className="text-xs p-3 bg-slate-50 border border-slate-300 rounded-xl font-medium outline-none focus:border-red-500 focus:bg-white text-slate-800"
+                />
+              </div>
+            </div>
+
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold text-slate-700">Brief Medical Issue (Optional)</label>
+              <label className="text-xs font-bold text-slate-700">Medical Condition / Details (Optional)</label>
               <input
                 type="text"
-                placeholder="e.g. Chest pain, accident, high fever with breathlessness..."
+                placeholder="e.g. Chest pain, road accident, breathing difficulty..."
                 value={emergencyDescription}
                 onChange={(e) => setEmergencyDescription(e.target.value)}
-                className="text-xs p-3 bg-slate-50 border border-slate-300 rounded-xl font-medium outline-none focus:border-red-500"
+                className="text-xs p-3 bg-slate-50 border border-slate-300 rounded-xl font-medium outline-none focus:border-red-500 text-slate-800"
               />
             </div>
 

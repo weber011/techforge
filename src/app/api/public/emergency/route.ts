@@ -22,7 +22,7 @@ function findNearestFacilityId(lat: number, lng: number): string {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { latitude, longitude, location_accuracy, severity, description, user_id } = body;
+    const { latitude, longitude, location_accuracy, severity, description, user_id, contact_phone, citizen_name } = body;
 
     if (latitude === undefined || longitude === undefined || isNaN(Number(latitude)) || isNaN(Number(longitude))) {
       return NextResponse.json({
@@ -40,7 +40,9 @@ export async function POST(req: Request) {
       severity: severity || 'CRITICAL',
       description: description || 'Emergency medical alert initiated by citizen from Public Portal.',
       nearest_facility_id,
-      user_id: user_id || 'CITIZEN_ANONYMOUS'
+      user_id: user_id || 'CITIZEN_ANONYMOUS',
+      contact_phone: contact_phone || '',
+      citizen_name: citizen_name || ''
     });
 
     return NextResponse.json({

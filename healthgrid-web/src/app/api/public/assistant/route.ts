@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { RANCHI_FACILITIES_MASTER } from '@/lib/ranchiData';
+import { createGroqChatCompletion } from '@/lib/groqClient';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,37 +20,74 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: 'Messages are required' }, { status: 400 });
     }
 
-    const latestUserMsg = messages[messages.length - 1]?.content || '';
-    const lower = latestUserMsg.toLowerCase();
-
-    // Check if AI API Key is available
-    const apiKey = process.env.GROQ_API_KEY || process.env.OPENAI_API_KEY;
-
-    let matchedFacilityIds: string[] = [];
-
-    // Local Tool Calling / Backend Lookup
     let relevantFacilities = RANCHI_FACILITIES_MASTER;
+    let locationContext = 'Citizen location not provided. Listing key Ranchi facilities.';
     if (userLocation?.latitude && userLocation?.longitude) {
       relevantFacilities = [...RANCHI_FACILITIES_MASTER]
         .map(f => ({ ...f, dist: haversine(userLocation.latitude, userLocation.longitude, f.latitude, f.longitude) }))
         .sort((a, b) => a.dist - b.dist);
-      matchedFacilityIds = relevantFacilities.slice(0, 3).map(f => f.facility_id);
-    } else {
-      matchedFacilityIds = ['RNC-DH-001', 'RNC-CHC-002', 'RNC-CHC-004'];
+      locationContext = `Citizen live coordinates: Lat ${userLocation.latitude}, Lng ${userLocation.longitude}. Nearest facilities: ${relevantFacilities.slice(0, 4).map(f => f.facility_name + ' (' + (f as any).dist + ' km away)').join(', ')}.`;
     }
 
-    if (!apiKey) {
-      // Deterministic Clinical & Facility Guidance without fake numbers
+    const matchedFacilityIds = relevantFacilities.slice(0, 3).map(f => f.facility_id);
+
+    const facilitiesKnowledge = relevantFacilities.map(f => 
+      `• ${f.facility_name} (${f.facility_type}) | Block: ${f.block} | Address: ${f.address} | Phone: ${f.phone} | Hours: ${f.opening_hours} | Emergency: ${f.emergency_available ? 'YES (24/7)' : 'NO'} | Beds: ${f.total_beds} | Services: ${f.services.join(', ')}`
+    ).join('\n');
+
+    const systemPrompt = `You are 'AI Swasthya Mitra' (AI स्वास्थ्य मित्र), the official AI Citizen Healthcare Advisor for the Government of Jharkhand Health Department (Ranchi District).
+
+YOUR MISSION:
+1. Help citizens find the nearest verified Primary Health Centres (PHC), Community Health Centres (CHC), Sub-Divisional Hospitals (SDH), and Sadar Hospital in Ranchi.
+2. Provide verified, safe first-aid & home remedies for mild symptoms (fever, ORS hydration, cold, cough, minor wounds).
+3. Guide citizens on OPD timings, government schemes (Ayushman Bharat / CM Jan Arogya Yojana), and free medicine supplies.
+4. For any serious red-flag symptom (chest pain, severe breathlessness, profuse bleeding, high trauma), immediately instruct the citizen to call 108 for Emergency Ambulance.
+
+CONTEXT & VERIFIED FACILITIES DATA:
+${locationContext}
+
+VERIFIED RANCHI FACILITIES:
+${facilitiesKnowledge}
+
+GUIDELINES:
+- Be warm, helpful, empathetic, and professional in English / Hindi (Hinglish/Hindi if the user speaks Hindi).
+- Use clear bullet points and bold names for readability.
+- When recommending facilities, state their name, block, address, contact number, and key services.
+- Always include emergency numbers at the end (108 for Ambulance, 104 for Health Advice).
+- Format clean Markdown responses.`;
+
+    try {
+      const completion = await createGroqChatCompletion({
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...messages.map((m: any) => ({ role: m.role, content: m.content }))
+        ],
+        temperature: 0.3,
+        max_tokens: 700
+      });
+
+      return NextResponse.json({
+        success: true,
+        reply: completion.reply,
+        model: completion.modelUsed,
+        map_action: {
+          type: 'SHOW_FACILITIES',
+          facility_ids: matchedFacilityIds
+        }
+      });
+    } catch (groqError: any) {
+      console.warn('Groq completion failed, falling back to deterministic advice:', groqError);
+      
+      const latestUserMsg = messages[messages.length - 1]?.content || '';
+      const lower = latestUserMsg.toLowerCase();
       let reply = '';
       if (lower.includes('ratu') || lower.includes('phc') || lower.includes('hospital') || lower.includes('near') || lower.includes('bed')) {
         const top = relevantFacilities.slice(0, 3);
         reply = `🏥 **Verified Ranchi Healthcare Facilities:**\n\n` +
-          top.map((f, i) => `${i+1}. **${f.facility_name}** (${f.facility_type})\n   📍 ${f.address}\n   📞 Contact: ${f.phone}\n   🩺 Services: ${f.services.slice(0, 3).join(', ')}`).join('\n\n') +
+          top.map((f: any, i) => `${i+1}. **${f.facility_name}** (${f.facility_type})\n   📍 ${f.address}\n   📞 Contact: ${f.phone}\n   🩺 Services: ${f.services.slice(0, 3).join(', ')}`).join('\n\n') +
           `\n\n*For medical emergencies, please dial **108**.*`;
       } else if (lower.includes('fever') || lower.includes('headache') || lower.includes('cold')) {
         reply = `🌡️ **First-Aid Advice for Mild Fever:**\n\n1. **Hydration:** Drink plenty of clean boiled water, ORS, and tender coconut water.\n2. **Rest:** Get adequate physical rest in a well-ventilated room.\n3. **Monitoring:** If temperature exceeds 101°F or persists over 48 hours, visit your nearest Primary Health Centre immediately.\n\n*Nearest Facility:* **${relevantFacilities[0].facility_name}** (${relevantFacilities[0].address}).`;
-      } else if (lower.includes('dehydration') || lower.includes('ors') || lower.includes('diarrhea')) {
-        reply = `💧 **Oral Rehydration Therapy (ORS) Guidance:**\n\n1. Dissolve 1 full ORS sachet in 1 Litre of clean drinking water.\n2. Sip 200-400ml after every loose stool.\n3. Free ORS packets are stocked at all government PHCs and Sub-Centres across Ranchi.\n\n*Nearest Centre:* **${relevantFacilities[0].facility_name}**.`;
       } else {
         reply = `Namaste! I am the **HealthGrid Citizen AI Assistant**.\n\nI can help you locate verified government healthcare facilities across Ranchi, check OPD timings, and provide first-aid guidance for mild symptoms.\n\n*Nearest available hospital:* **${relevantFacilities[0].facility_name}** (${relevantFacilities[0].address}). For urgent assistance, dial **108** (Ambulance) or **104** (Medical helpline).`;
       }
@@ -63,50 +101,8 @@ export async function POST(req: Request) {
         }
       });
     }
-
-    // Call Groq / OpenAI LLM
-    try {
-      const { Groq } = await import('groq-sdk');
-      const groq = new Groq({ apiKey });
-
-      const systemPrompt = `You are HealthGrid Citizen AI Assistant for the Government of Jharkhand Health Department.
-Your job is to assist citizens in locating verified healthcare facilities (PHC, CHC, Sadar Hospital) across Ranchi and Jharkhand, and provide first-aid advice for mild symptoms.
-Available verified facilities in database:
-${RANCHI_FACILITIES_MASTER.map(f => `- ${f.facility_id}: ${f.facility_name} (${f.facility_type}) in ${f.block}, address: ${f.address}, phone: ${f.phone}, services: ${f.services.join(', ')}`).join('\n')}
-
-Always provide empathetic, accurate, and actionable guidance. Remind citizens to dial 108 for emergency ambulances.`;
-
-      const response = await groq.chat.completions.create({
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...messages.map((m: any) => ({ role: m.role, content: m.content }))
-        ],
-        model: 'llama-3.3-70b-versatile',
-        temperature: 0.3,
-        max_tokens: 500
-      });
-
-      const reply = response.choices[0]?.message?.content || 'Verified healthcare services are available at your nearest PHC.';
-
-      return NextResponse.json({
-        success: true,
-        reply,
-        map_action: {
-          type: 'SHOW_FACILITIES',
-          facility_ids: matchedFacilityIds
-        }
-      });
-    } catch (llmErr) {
-      return NextResponse.json({
-        success: true,
-        reply: `🏥 **Nearest Health Facilities in Ranchi:**\n\n1. **${relevantFacilities[0].facility_name}** - ${relevantFacilities[0].address}\n2. **${relevantFacilities[1].facility_name}** - ${relevantFacilities[1].address}\n\n*Dial 108 for Emergency Ambulance Services.*`,
-        map_action: {
-          type: 'SHOW_FACILITIES',
-          facility_ids: matchedFacilityIds
-        }
-      });
-    }
   } catch (error: any) {
+    console.error('AI assistant route error:', error);
     return NextResponse.json({ success: false, error: 'AI Assistant is currently unavailable.' }, { status: 500 });
   }
 }
