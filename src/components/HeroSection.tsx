@@ -123,16 +123,16 @@ export default function HeroSection() {
 
               <Link 
                 href="/public" 
-                className="p-4 bg-white/95 border-2 border-emerald-600 text-[#064e3b] rounded-xl shadow-md hover:shadow-lg hover:bg-emerald-50 transition-all flex flex-col justify-between group"
+                className="p-4 bg-[#064e3b] text-white rounded-xl shadow-md hover:shadow-lg hover:bg-[#047857] transition-all flex flex-col justify-between group border border-emerald-700"
               >
                 <div>
-                  <div className="flex items-center justify-between text-[#047857] mb-2">
-                    <Activity className="w-5 h-5 text-[#047857]" />
+                  <div className="flex items-center justify-between text-emerald-200 mb-2">
+                    <Activity className="w-5 h-5 text-amber-300" />
                     <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
-                  <div className="text-xs font-black text-[#064e3b]">आपातकालीन सहायता</div>
-                  <div className="text-[11px] font-bold text-emerald-800">108 / 104 Helplines</div>
-                  <div className="text-[10px] text-slate-600 mt-1">Direct Emergency Ambulance</div>
+                  <div className="text-xs font-black text-white">आपातकालीन सहायता</div>
+                  <div className="text-[11px] font-bold text-emerald-100">108 / 104 Helplines</div>
+                  <div className="text-[10px] text-emerald-200 mt-1">Direct Emergency Ambulance</div>
                 </div>
               </Link>
             </div>
