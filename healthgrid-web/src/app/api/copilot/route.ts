@@ -145,10 +145,10 @@ export async function POST(req: Request) {
 
     const systemPrompt = {
       role: 'system',
-      content: \`You are the HealthGrid AI Health Copilot, an expert operations assistant for public healthcare supply chains.
+      content: `You are the HealthGrid AI Health Copilot, an expert operations assistant for public healthcare supply chains.
       Your goal is to help government users optimize resources, predict shortages, and manage emergencies.
       You have access to tools to fetch real-time operational data. ALWAYS use the tools to answer questions about PHC risk, inventory, or forecasting.
-      Keep answers concise, professional, and data-driven. Do not use generic AI greetings.\`
+      Keep answers concise, professional, and data-driven. Do not use generic AI greetings.`
     };
 
     let currentMessages = [systemPrompt, ...messages];
