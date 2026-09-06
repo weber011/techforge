@@ -26,7 +26,7 @@ export default function NewsTicker() {
   }, []);
 
   return (
-    <div className="w-full bg-white border-b border-emerald-200 shadow-2xs flex items-stretch overflow-hidden text-xs z-30">
+    <div className="w-full bg-white border-b border-emerald-200 shadow-2xs flex items-stretch overflow-hidden text-xs relative z-10">
       {/* Forest Green Badge with Saffron Top Line (Jharkhand Government Design) */}
       <div className="relative bg-[#064e3b] text-white px-5 py-2.5 flex items-center justify-center font-bold tracking-wider shrink-0 z-10 shadow-md">
         <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#f37021]"></div>

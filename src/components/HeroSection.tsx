@@ -18,7 +18,7 @@ export default function HeroSection() {
     <div className="relative w-full bg-white font-sans flex flex-col min-h-screen jharkhand-bg-watermark">
       
       {/* Top Government Official Strip (Jharkhand Deep Forest Green) */}
-      <div className="w-full bg-[#064e3b] text-white px-4 sm:px-6 py-1.5 flex items-center justify-between text-[11px] font-medium z-20 border-b border-[#047857]">
+      <div className="w-full bg-[#064e3b] text-white px-4 sm:px-6 py-1.5 flex items-center justify-between text-[11px] font-medium z-40 border-b border-[#047857] relative">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           <span>{t('govt_jharkhand', 'झारखंड सरकार')} &bull; {t('state_health_command', 'राज्य स्वास्थ्य कमान केंद्र &bull; RANCHI HEALTH COMMAND')}</span>
@@ -30,7 +30,7 @@ export default function HeroSection() {
       </div>
 
       {/* Main Government Header with MoHFW & Jharkhand Seal */}
-      <header className="w-full px-6 md:px-12 py-3.5 bg-white/95 backdrop-blur-md border-b border-emerald-200 flex items-center justify-between z-20 shadow-xs">
+      <header className="w-full px-6 md:px-12 py-3.5 bg-white/95 backdrop-blur-md border-b border-emerald-200 flex items-center justify-between z-50 shadow-xs sticky top-0">
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-3">
             <div className="relative h-12 w-48 sm:w-60">

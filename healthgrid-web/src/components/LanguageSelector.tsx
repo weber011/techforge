@@ -43,7 +43,7 @@ export default function LanguageSelector({ variant = 'default' }: { variant?: 'd
   }
 
   return (
-    <div className="relative inline-block text-left" ref={dropdownRef}>
+    <div className={`relative inline-block text-left ${isOpen ? 'z-[9999]' : 'z-30'}`} ref={dropdownRef}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
@@ -60,29 +60,31 @@ export default function LanguageSelector({ variant = 'default' }: { variant?: 'd
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-1.5 w-44 rounded-2xl bg-white shadow-xl border-2 border-emerald-300 py-1.5 z-50 animate-in zoom-in-95 text-xs font-semibold">
-          <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-emerald-100">
+        <div className="absolute right-0 mt-2 w-48 rounded-2xl bg-white shadow-2xl border-2 border-emerald-400 py-1.5 z-[9999] animate-in fade-in zoom-in-95 text-xs font-semibold ring-1 ring-black/10">
+          <div className="px-3 py-1.5 text-[10px] font-black text-slate-500 uppercase tracking-wider border-b border-emerald-100 bg-slate-50/80">
             Select Language / भाषा चुनें
           </div>
-          {supportedLanguages.map((item) => (
-            <button
-              key={item.code}
-              type="button"
-              onClick={() => {
-                setLang(item.code);
-                setIsOpen(false);
-              }}
-              className={`w-full text-left px-3 py-2 flex items-center justify-between hover:bg-emerald-50 transition-colors ${
-                lang === item.code ? 'bg-emerald-100/70 text-[#064e3b] font-black' : 'text-slate-700'
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <span>{item.flag}</span>
-                <span>{item.nativeLabel}</span>
-              </div>
-              {lang === item.code && <Check className="w-3.5 h-3.5 text-[#047857]" />}
-            </button>
-          ))}
+          <div className="py-1">
+            {supportedLanguages.map((item) => (
+              <button
+                key={item.code}
+                type="button"
+                onClick={() => {
+                  setLang(item.code);
+                  setIsOpen(false);
+                }}
+                className={`w-full text-left px-3 py-2 flex items-center justify-between hover:bg-emerald-50 transition-colors ${
+                  lang === item.code ? 'bg-emerald-100/80 text-[#064e3b] font-black' : 'text-slate-700'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">{item.flag}</span>
+                  <span className="font-bold">{item.nativeLabel}</span>
+                </div>
+                {lang === item.code && <Check className="w-4 h-4 text-[#047857]" />}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>
