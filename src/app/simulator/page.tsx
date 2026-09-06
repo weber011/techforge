@@ -3,8 +3,11 @@
 import React, { useState } from 'react';
 import { Activity, AlertTriangle, ShieldAlert, ArrowLeft, RefreshCw, Zap, TrendingUp, Bed, Pill } from 'lucide-react';
 import Link from 'next/link';
+import LanguageSelector from '@/components/LanguageSelector';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function SimulatorPage() {
+  const { t } = useLanguage();
   const [patientSurge, setPatientSurge] = useState(40);
   const [medicineDemand, setMedicineDemand] = useState(40);
   const [phcUnavailable, setPhcUnavailable] = useState('');
@@ -39,7 +42,7 @@ export default function SimulatorPage() {
       {/* Top Bar */}
       <header className="w-full bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center gap-4">
-          <Link href="/dashboard" className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors">
+          <Link href="/govt" className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="flex items-center gap-2">
@@ -47,13 +50,14 @@ export default function SimulatorPage() {
               <Zap className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-slate-800 leading-tight">Digital Twin & Emergency Simulator</h1>
+              <h1 className="text-lg font-bold text-slate-800 leading-tight">Digital Twin &amp; Emergency Simulator</h1>
               <p className="text-xs text-slate-500">HEALTHGRID NETWORK RESILIENCE ENGINE</p>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <span className="px-3 py-1 bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold rounded-full flex items-center gap-1.5">
+          <LanguageSelector />
+          <span className="px-3 py-1 bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold rounded-full flex items-center gap-1.5 hidden sm:flex">
             <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
             Simulation Sandbox Mode
           </span>

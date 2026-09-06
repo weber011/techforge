@@ -1,0 +1,421 @@
+export type Language = 'hi' | 'en' | 'sant' | 'bn';
+
+export interface LanguageOption {
+  code: Language;
+  label: string;
+  nativeLabel: string;
+  flag: string;
+}
+
+export const SUPPORTED_LANGUAGES: LanguageOption[] = [
+  { code: 'hi', label: 'Hindi', nativeLabel: 'हिन्दी', flag: '🇮🇳' },
+  { code: 'en', label: 'English', nativeLabel: 'English', flag: '🌐' },
+  { code: 'sant', label: 'Santali', nativeLabel: 'ᱥᱟᱱᱛᱟᱲᱤ (संथाली)', flag: '🏹' },
+  { code: 'bn', label: 'Bengali', nativeLabel: 'বাংলা', flag: '🌿' }
+];
+
+export const translations: Record<Language, Record<string, string>> = {
+  hi: {
+    // Top official bar
+    'govt_jharkhand': 'झारखंड सरकार',
+    'health_dept': 'स्वास्थ्य, चिकित्सा शिक्षा एवं परिवार कल्याण विभाग',
+    'state_health_command': 'राज्य स्वास्थ्य कमान केंद्र &bull; RANCHI HEALTH COMMAND',
+    'official_access_only': 'आधिकारिक प्रवेश केवल',
+    'prototype_live': '● HEALTHGRID AI लाइव प्रोटोटाइप',
+    
+    // Navbar
+    'nav_home': 'मुख्य पृष्ठ',
+    'nav_public': 'नागरिक पोर्टल',
+    'nav_phc': 'PHC स्टाफ पोर्टल',
+    'nav_govt': 'सरकारी कमान',
+    'nav_simulator': 'डिजिटल ट्विन सिम्युलेटर',
+    'nav_emergency_108': '108 आपातकालीन',
+    'nav_logout': 'लॉगआउट',
+    'nav_login': 'लॉगिन',
+    
+    // News Ticker
+    'news_title': 'ताज़ा समाचार / LATEST NEWS',
+    'news_badge': '💥 नया',
+    
+    // Hero Section
+    'hero_badge': 'झारखंड स्वास्थ्य ग्रिड • HEALTHGRID JHARKHAND',
+    'hero_title_1': 'पूर्वानुमान। तैयारी।',
+    'hero_title_2': 'पुनर्वितरण। जीवन रक्षा।',
+    'hero_subtitle': 'झारखंड के प्राथमिक स्वास्थ्य केंद्रों (PHC) और जिला अस्पतालों को जोड़ने वाला रीयल-टाइम स्वास्थ्य ग्रिड — 72 घंटे पूर्व दवा संकट पूर्वानुमान, GIS आधारित नजदीकी सुविधा खोज, और स्वचालित इंटर-PHC दवा पुनर्वितरण।',
+    
+    // Hero Quick Access Cards
+    'card_phc_search_title': 'नजदीकी स्वास्थ्य केंद्र',
+    'card_phc_search_sub': 'Find Nearest PHC / CHC',
+    'card_phc_search_desc': 'लाइव बेड क्षमता एवं ओपीडी समय',
+    'card_ai_mitra_title': 'AI स्वास्थ्य मित्र',
+    'card_ai_mitra_sub': 'Citizen Health AI',
+    'card_ai_mitra_desc': '24x7 लक्षण मार्गदर्शन एवं प्राथमिक उपचार',
+    'card_emergency_title': 'आपातकालीन सहायता',
+    'card_emergency_sub': '108 / 104 हेल्पलाइन',
+    'card_emergency_desc': 'सीधी 108 एम्बुलेंस जीपीएस कॉल',
+    
+    // Hero Stats
+    'stat_phc_count': 'सत्यापित PHC / CHC केंद्र',
+    'stat_ranchi_data': '100% वास्तविक रांची डेटा',
+    'stat_surge_radar': '72h पूर्व दवा संकट अलर्ट',
+    'stat_prediction_accuracy': '92% AI पूर्वानुमान सटीकता',
+    'stat_supply_corridors': 'सक्रिय आपूर्ति गलियारे',
+    'stat_direct_transfers': 'इंटर-PHC त्वरित स्टॉक शेयरिंग',
+    'stat_emergency_dispatches': 'लाइव 108 एम्बुलेंस नेटवर्क',
+    'stat_zero_stockouts': 'शून्य आवश्यक दवा की कमी लक्ष्य',
+    
+    // Portals Section
+    'portals_title': 'त्रि-स्तरीय स्वास्थ्य ग्रिड पोर्टल संरचना',
+    'portals_subtitle': 'नागरिकों, प्राथमिक स्वास्थ्य केंद्र कर्मियों एवं राज्य सरकार के लिए एकीकृत प्रणाली',
+    'portal_citizen_name': '1. नागरिक पोर्टल (Public Citizen Portal)',
+    'portal_citizen_desc': 'जीपीएस से नजदीकी अस्पताल, 24/7 आपातकालीन 108 कॉल, ओपीडी समय एवं लक्षण AI गाइड।',
+    'portal_phc_name': '2. PHC स्टाफ पोर्टल (PHC Staff Station)',
+    'portal_phc_desc': 'प्रत्येक PHC का सुरक्षित लॉगिन, लाइव बेड/डॉक्टर क्षमता, 108 एम्बुलेंस स्थिति, एवं AI क्लिनिकल कोपायलट।',
+    'portal_govt_name': '3. सरकारी कमान केंद्र (Govt Command Radar)',
+    'portal_govt_desc': 'राज्य स्वास्थ्य मुख्यालय से सभी 10 PHC की लाइव निगरानी, निर्देश प्रेषण, एवं महामारी पूर्वानुमान।',
+    'open_portal_btn': 'पोर्टल खोलें ➔',
+
+    // Leadership Section
+    'leadership_title': 'स्वास्थ्य नेतृत्व एवं मार्गदर्शन',
+    'leadership_subtitle': 'झारखंड सरकार स्वास्थ्य, चिकित्सा शिक्षा एवं परिवार कल्याण विभाग',
+    'cm_designation': 'माननीय मुख्यमंत्री, झारखंड सरकार',
+    'cm_quote': '"हर ग्रामीण व सुदूर क्षेत्र तक सुलभ, त्वरित एवं आधुनिक स्वास्थ्य सेवाएं पहुंचाना हमारी सर्वोच्च प्राथमिकता है।"',
+    'hm_designation': 'माननीय स्वास्थ्य मंत्री, झारखंड सरकार',
+    'hm_quote': '"हेल्थग्रिड AI तकनीक द्वारा अंतिम प्राथमिक स्वास्थ्य केंद्र तक आवश्यक दवाओं की निरंतर उपलब्धता सुनिश्चित होगी।"',
+    'cs_designation': 'सिविल सर्जन, रांची जिला',
+    'cs_quote': '"10 ब्लॉक स्तरीय PHC का वास्तविक समन्वय व त्वरित 108 आपातकालीन सेवा हमारी प्रतिबद्धता है।"',
+
+    // Medical Field Highlights Section
+    'highlights_badge': 'झारखंड सरकार • उपलब्धियां',
+    'highlights_title': 'चिकित्सा एवं स्वास्थ्य क्षेत्र की प्रमुख उपलब्धियां',
+    'highlights_subtitle': 'ग्रामीण PHC आधुनिकीकरण, 108 एम्बुलेंस नेटवर्क, आधुनिक अस्पताल अवसंरचना एवं विशेषज्ञ स्वास्थ्य सेवाएं',
+    'highlight_1_title': 'जिला प्राथमिक स्वास्थ्य केंद्रों में सुसज्जित 108 एम्बुलेंस प्रणाली',
+    'highlight_1_desc': '24/7 लाइफ-सपोर्ट युक्त एम्बुलेंस नेटवर्क द्वारा ब्लॉक स्तरीय PHC को सीधे जिला अस्पतालों से जोड़ा गया है।',
+    'highlight_2_title': 'अस्पताल अवसंरचना एवं नए आधुनिक वार्ड्स का विस्तार',
+    'highlight_2_desc': 'सदर अस्पताल रांची एवं जिला स्तर पर 500+ बेड, अत्याधुनिक आईसीयू, एनआईसीयू और डायलिसिस केंद्र क्रियाशील।',
+    'highlight_3_title': 'अत्याधुनिक चिकित्सा उपकरणों एवं जांच प्रयोगशालाओं की स्थापना',
+    'highlight_3_desc': 'डिजिटल एक्स-रे, अल्ट्रासाउंड, सीटी स्कैन और उन्नत रक्त जांच सुविधाएं ग्रामीण स्तर पर उपलब्ध।',
+    'highlight_4_title': 'मातृ एवं शिशु स्वास्थ्य: सुरक्षित मातृत्व व पोषण अभियान',
+    'highlight_4_desc': 'संस्थागत प्रसव में ऐतिहासिक वृद्धि, जननी शिशु सुरक्षा योजना एवं विशेष नवजात देखभाल इकाइयां (SNCU)।',
+    'highlight_5_title': 'ग्रामीण क्षेत्रों में मोबाइल मेडिकल यूनिट्स (MMU) एवं टेलीमेडिसिन',
+    'highlight_5_desc': 'दूरदराज के गांवों तक डॉक्टरों की टीम, निःशुल्क दवा वितरण और ई-संजीवनी टेलीकंसल्टेशन द्वारा उपचार।',
+    'highlight_6_title': 'मुफ्त आवश्यक दवा योजना एवं AI आधारित स्टॉक आपूर्ति प्रणाली',
+    'highlight_6_desc': '150+ आवश्यक दवाएं, एंटी-स्नेक वेनम और जीवन रक्षक इंजेक्शन निःशुल्क उपलब्ध।',
+
+    // Public Portal Page
+    'public_header_title': 'नागरिक स्वास्थ्य एवं आपातकालीन सहायता पोर्टल',
+    'public_header_sub': 'CITIZEN HEALTHCARE, NEARBY PHC FINDER & 24/7 EMERGENCY SOS',
+    'public_sos_banner_title': '🚨 तत्काल 108 आपातकालीन एम्बुलेंस सहायता (Emergency SOS)',
+    'public_sos_banner_sub': 'गंभीर स्थिति में सीधे नजदीकी अस्पताल को अपना सटीक जीपीएस स्थान भेजें या 108 पर कॉल करें',
+    'public_caller_name': 'मरीज / कॉलर का नाम:',
+    'public_caller_phone': 'फोन नंबर (अनिवार्य):',
+    'public_emergency_nature': 'आपातकाल का प्रकार:',
+    'public_gps_btn_send': '🚨 108 आपातकालीन सहायता भेजें (Send Live Coordinates)',
+    'public_gps_granted': '✓ सटीक जीपीएस स्थान प्राप्त',
+    'public_gps_requesting': 'जीपीएस स्थान प्राप्त किया जा रहा है...',
+    'public_search_placeholder': 'स्वास्थ्य केंद्र का नाम, ब्लॉक या पता खोजें (जैसे: Ratu, Kanke, Sadar, Bero)...',
+    'public_filter_all_services': 'सभी सार्वजनिक सेवाएं',
+    'public_verified_list': 'सत्यापित स्वास्थ्य केंद्र सूची',
+    'public_beds_avail': 'उपलब्ध बेड',
+    'public_doctors_on_duty': 'उपस्थित डॉक्टर',
+    'public_ambulance_status': '108 एम्बुलेंस स्थिति',
+    'public_directions_btn': 'दिशा-निर्देश प्राप्त करें (Directions)',
+    'public_call_btn': 'अस्पताल को कॉल करें',
+    'public_ai_mitra_header': '🤖 स्वास्थ्य मित्र (HealthGrid AI Assistant)',
+    'public_ai_mitra_sub': 'लक्षण बताएं, दवा और घरेलू उपचार की सलाह लें (हिन्दी / English)',
+    'public_ask_placeholder': 'अपने लक्षण या स्वास्थ्य संबंधी प्रश्न पूछें...',
+    'public_send_btn': 'पूछें',
+
+    // PHC Staff Portal Page
+    'phc_portal_header': 'प्राथमिक स्वास्थ्य केंद्र स्टाफ लॉगिन',
+    'phc_portal_sub': 'Official PHC / CHC Medical Officer & Staff Gateway',
+    'phc_email_label': 'PHC आधिकारिक ईमेल:',
+    'phc_password_label': 'पासवर्ड:',
+    'phc_login_btn': 'PHC पोर्टल में प्रवेश करें',
+    'phc_directory_title': 'Ranchi District PHC Directory',
+    'phc_directory_desc': 'ईमेल आईडी चुनने के लिए किसी भी PHC पर क्लिक करें, फिर अपना पासवर्ड दर्ज करें:',
+    'phc_capacity_controls_title': 'दैनिक क्षमता एवं परिचालन स्थिति अपडेट (Live Facility Controls)',
+    'phc_capacity_controls_desc': 'यहां किए गए बदलाव तुरंत सरकारी कमान केंद्र और नागरिक पोर्टल पर अपडेट होते हैं!',
+    'phc_avail_beds': 'Available Beds (उपलब्ध बेड):',
+    'phc_doctors_duty': 'Doctors On Duty (उपस्थित डॉक्टर):',
+    'phc_amb_status': '108 Ambulance Status:',
+    'phc_er_status': 'Emergency Room (ER) Status:',
+    'phc_save_broadcast_btn': 'कमान केंद्र में क्षमता अपडेट सहेजें (Save & Broadcast)',
+    'phc_sentinel_title': 'Autonomous Shortage Notification Engine (AI स्वचालित अलर्ट)',
+    'phc_sentinel_desc': 'जब भी कोई दवा 300 यूनिट (चेतावनी) या 200 यूनिट (गंभीर कमी) से कम होती है, तो AI सेंटिनल स्वचालित रूप से राज्य कमान केंद्र को अलर्ट भेजता है।',
+    'phc_copilot_title': 'PHC Medical Officer & Staff AI Copilot (दवा गणना एवं प्रोटोकॉल सहायक)',
+    'phc_copilot_desc': 'खुराक गणना, एंटी-स्नेक वेनम (ASV) प्रोटोकॉल, ORS मात्रा चार्ट, IV ड्रिप दर, या बफर बर्न-रेट फॉर्मूला पूछें',
+    'phc_ask_copilot_placeholder': 'क्लिनिकल प्रश्न या दवा गणना पूछें (जैसे: 12kg बच्चे के लिए पेरासिटामोल खुराक)...',
+    'phc_incoming_directives': 'मुख्यालय से प्राप्त सरकारी निर्देश (Govt Directives)',
+    'phc_req_to_govt_title': 'सरकार से सहायता / आपात आपूर्ति मांगें (Escalate Need to Govt)',
+    'phc_drug_inventory_title': 'PHC दवा एवं आपूर्ति प्रबंधन (Real-Time Drug Inventory)',
+    'phc_add_medicine_btn': '+ नई दवा बैच जोड़ें',
+
+    // Government Command Portal Page
+    'govt_header_title': 'मुख्यालय स्वास्थ्य कमान केंद्र',
+    'govt_header_sub': 'HEALTHGRID AI JHARKHAND COMMAND RADAR',
+    'govt_login_title': 'सरकारी कमान केंद्र लॉगिन',
+    'govt_id_label': 'Government ID / सरकारी आईडी:',
+    'govt_pass_label': 'Password / पासवर्ड:',
+    'govt_login_btn': 'कमान केंद्र में प्रवेश करें (Authenticate & Enter)',
+    'govt_kpi_verified_phcs': 'सत्यापित PHC केंद्र',
+    'govt_kpi_active_emergencies': 'सक्रिय नागरिक आपातकालीन कॉल्स',
+    'govt_kpi_incoming_requests': 'PHC से प्राप्त मांगें',
+    'govt_kpi_supply_corridors': 'AI आपूर्ति गलियारे',
+    'govt_escalations_title': 'PHC से प्राप्त आपातकालीन मांगें एवं सहायता अनुरोध (Incoming PHC Requests)',
+    'govt_telemetry_title': 'सभी 10 प्राथमिक स्वास्थ्य केंद्रों की लाइव स्थिति (Live Real-Time PHC Telemetry)',
+    'govt_directives_title': 'PHC को निर्देश या आपूर्ति आदेश भेजें (Send Directive to PHC)',
+    'govt_emergencies_radar_title': 'नागरिक आपातकालीन कतार / LIVE CITIZEN EMERGENCY RADAR',
+    'govt_outbreak_radar_title': '72H AI OUTBREAK RADAR (महामारी पूर्वानुमान)',
+
+    // Simulator Page
+    'sim_header_title': 'डिजिटल ट्विन महामारी एवं आपूर्ति पुनर्वितरण सिम्युलेटर',
+    'sim_header_sub': 'RANCHI HEALTHCARE DIGITAL TWIN & EPIDEMIC STRESS SIMULATOR',
+    'sim_control_panel': 'सिमुलेशन नियंत्रण कक्ष',
+    'sim_outbreak_intensity': 'महामारी तीव्रता (Outbreak Surge Factor):',
+    'sim_run_btn': 'सिमुलेशन चलाएं (Run Digital Twin)',
+    'sim_results_title': '72 घंटे का पूर्वानुमान एवं आपूर्ति संतुलन',
+
+    // Footer
+    'footer_text': 'झारखंड सरकार • स्वास्थ्य, चिकित्सा शिक्षा एवं परिवार कल्याण विभाग • HealthGrid AI'
+  },
+
+  en: {
+    // Top official bar
+    'govt_jharkhand': 'Government of Jharkhand',
+    'health_dept': 'Department of Health, Medical Education & Family Welfare',
+    'state_health_command': 'State Health Command Radar &bull; RANCHI COMMAND RADAR',
+    'official_access_only': 'Official Access Only',
+    'prototype_live': '● HEALTHGRID AI LIVE PROTOTYPE',
+    
+    // Navbar
+    'nav_home': 'Home',
+    'nav_public': 'Citizen Portal',
+    'nav_phc': 'PHC Staff Portal',
+    'nav_govt': 'Govt Command',
+    'nav_simulator': 'Digital Twin Simulator',
+    'nav_emergency_108': '108 Emergency',
+    'nav_logout': 'Logout',
+    'nav_login': 'Login',
+    
+    // News Ticker
+    'news_title': 'LATEST ANNOUNCEMENTS',
+    'news_badge': '💥 NEW',
+    
+    // Hero Section
+    'hero_badge': 'HEALTHGRID JHARKHAND • AI HEALTHCARE RADAR',
+    'hero_title_1': 'Predict. Prepare.',
+    'hero_title_2': 'Redistribute. Save.',
+    'hero_subtitle': 'Real-time public health grid connecting Primary Health Centres (PHC) and District Hospitals across Jharkhand — 72h stockout forecasting, GIS nearby facility discovery, and automated inter-PHC drug redistribution.',
+    
+    // Hero Quick Access Cards
+    'card_phc_search_title': 'Nearest Healthcare Facility',
+    'card_phc_search_sub': 'Find Nearest PHC / CHC',
+    'card_phc_search_desc': 'Live Bed Capacity & OPD Schedules',
+    'card_ai_mitra_title': 'Citizen Health AI Assistant',
+    'card_ai_mitra_sub': 'Swasthya Mitra AI',
+    'card_ai_mitra_desc': '24/7 Symptoms & First-Aid Guidance',
+    'card_emergency_title': 'Emergency SOS Dispatch',
+    'card_emergency_sub': '108 / 104 Helplines',
+    'card_emergency_desc': 'Direct 108 GPS Ambulance Alert',
+    
+    // Hero Stats
+    'stat_phc_count': 'Verified PHC / CHC Centres',
+    'stat_ranchi_data': '100% Real Ranchi GIS Data',
+    'stat_surge_radar': '72h Pre-Outbreak Warning Radar',
+    'stat_prediction_accuracy': '92% AI Predictive Accuracy',
+    'stat_supply_corridors': 'Active Supply Corridors',
+    'stat_direct_transfers': 'Inter-PHC Stock Balancing',
+    'stat_emergency_dispatches': 'Live 108 Ambulance Network',
+    'stat_zero_stockouts': 'Zero Stockout Mission Target',
+    
+    // Portals Section
+    'portals_title': 'Three-Tier HealthGrid Architecture',
+    'portals_subtitle': 'Integrated platform connecting citizens, primary care medical staff, and state command headquarters',
+    'portal_citizen_name': '1. Public Citizen Portal (/public)',
+    'portal_citizen_desc': 'GPS nearest facility discovery, 24/7 SOS 108 ambulance dispatch, OPD hours, and bilingual clinical AI assistant.',
+    'portal_phc_name': '2. PHC Staff Station (/phc)',
+    'portal_phc_desc': 'Dedicated login for all 10 Ranchi PHCs, live bed & doctor controls, 108 ambulance telemetry, and clinical dosage copilot.',
+    'portal_govt_name': '3. Government Command Radar (/govt)',
+    'portal_govt_desc': 'Statewide operational radar, incoming PHC support escalations, directives dispatch, and outbreak telemetry.',
+    'open_portal_btn': 'Open Portal ➔',
+
+    // Leadership Section
+    'leadership_title': 'Health Leadership & Vision',
+    'leadership_subtitle': 'Government of Jharkhand Health, Medical Education & Family Welfare Department',
+    'cm_designation': 'Hon\'ble Chief Minister, Government of Jharkhand',
+    'cm_quote': '"Delivering accessible, rapid, and modern healthcare to every rural and tribal doorstep is our highest priority."',
+    'hm_designation': 'Hon\'ble Minister of Health, Government of Jharkhand',
+    'hm_quote': '"HealthGrid AI ensures continuous availability of essential medicines down to the last primary health centre."',
+    'cs_designation': 'Civil Surgeon, Ranchi District',
+    'cs_quote': '"Seamless coordination across all 10 block PHCs with rapid 108 emergency response is our daily commitment."',
+
+    // Medical Field Highlights Section
+    'highlights_badge': 'GOVT OF JHARKHAND • ACHIEVEMENTS',
+    'highlights_title': 'Key Medical & Healthcare Field Highlights',
+    'highlights_subtitle': 'Department of Health initiatives in rural PHC upgrades, 108 life-support ambulances, hospital infrastructure, and specialist care',
+    'highlight_1_title': 'Equipped 108 Ambulance Network Across District PHCs',
+    'highlight_1_desc': '24/7 advanced life support ambulance network connecting block PHCs directly to district super-specialty hospitals.',
+    'highlight_2_title': 'Hospital Infrastructure & Modern Ward Expansion',
+    'highlight_2_desc': 'Sadar Hospital Ranchi & district centers expanded to 500+ beds, advanced ICUs, NICUs, and hemodialysis units.',
+    'highlight_3_title': 'Advanced Medical Equipment & Modern Diagnostic Labs',
+    'highlight_3_desc': 'Digital X-ray, ultrasound, CT scans, and automated pathology laboratories made available at rural block centers.',
+    'highlight_4_title': 'Maternal & Child Health: Safe Motherhood Initiatives',
+    'highlight_4_desc': 'Record increase in institutional deliveries with Janani Shishu Suraksha Karyakram and Special Newborn Care Units (SNCU).',
+    'highlight_5_title': 'Mobile Medical Units (MMU) & Telemedicine in Rural Blocks',
+    'highlight_5_desc': 'Doorstep doctor visits, free medicine delivery, and e-Sanjeevani teleconsultations for remote villages.',
+    'highlight_6_title': 'Free Essential Drug Scheme & AI Automated Stock Grid',
+    'highlight_6_desc': '150+ essential drugs, anti-snake venoms, and lifesaving emergency injections supplied 100% free of cost.',
+
+    // Public Portal Page
+    'public_header_title': 'Citizen Healthcare & Emergency Assistance Portal',
+    'public_header_sub': 'CITIZEN HEALTHCARE, NEARBY PHC FINDER & 24/7 EMERGENCY SOS',
+    'public_sos_banner_title': '🚨 Instant 108 Emergency Ambulance Dispatch (Emergency SOS)',
+    'public_sos_banner_sub': 'In critical medical conditions, transmit your exact GPS coordinates to nearest PHC or call 108',
+    'public_caller_name': 'Patient / Caller Name:',
+    'public_caller_phone': 'Phone Number (Required):',
+    'public_emergency_nature': 'Nature of Emergency:',
+    'public_gps_btn_send': '🚨 Transmit Live GPS Coordinates to 108 Dispatch',
+    'public_gps_granted': '✓ High-Accuracy GPS Coordinates Acquired',
+    'public_gps_requesting': 'Acquiring GPS location...',
+    'public_search_placeholder': 'Search facility name, block, or address (e.g. Ratu, Kanke, Sadar, Bero)...',
+    'public_filter_all_services': 'All Public Services',
+    'public_verified_list': 'Verified Facility List',
+    'public_beds_avail': 'Available Beds',
+    'public_doctors_on_duty': 'Doctors on Duty',
+    'public_ambulance_status': '108 Ambulance Status',
+    'public_directions_btn': 'Get Directions',
+    'public_call_btn': 'Call Facility',
+    'public_ai_mitra_header': '🤖 Swasthya Mitra (HealthGrid AI Assistant)',
+    'public_ai_mitra_sub': 'Share symptoms, ask home remedies and clinical guidance (English / Hindi)',
+    'public_ask_placeholder': 'Ask any clinical or symptom guidance question...',
+    'public_send_btn': 'Ask AI',
+
+    // PHC Staff Portal Page
+    'phc_portal_header': 'PHC Staff Station & Medical Officer Gateway',
+    'phc_portal_sub': 'Official PHC / CHC Medical Officer & Staff Gateway',
+    'phc_email_label': 'PHC Official Email:',
+    'phc_password_label': 'Password:',
+    'phc_login_btn': 'Authenticate & Enter PHC Portal',
+    'phc_directory_title': 'Ranchi District PHC Directory',
+    'phc_directory_desc': 'Click any PHC to select its official email, then enter your officer password:',
+    'phc_capacity_controls_title': 'Live Facility Operational Controls',
+    'phc_capacity_controls_desc': 'Changes saved here immediately broadcast to Government Command Radar and Public Citizen Map!',
+    'phc_avail_beds': 'Available Beds:',
+    'phc_doctors_duty': 'Doctors on Duty:',
+    'phc_amb_status': '108 Ambulance Status:',
+    'phc_er_status': 'Emergency Room (ER) Status:',
+    'phc_save_broadcast_btn': 'Save & Broadcast Operational Capacity to Govt Radar',
+    'phc_sentinel_title': 'Autonomous Shortage Notification Engine (AI Sentinel)',
+    'phc_sentinel_desc': 'Whenever any drug stock falls below 300 units (Warning) or 200 units (Critical Shortage), the AI Sentinel automatically dispatches an emergency ticket directly to State Command Radar.',
+    'phc_copilot_title': 'PHC Medical Officer & Staff AI Copilot (Clinical Dosage & Protocols)',
+    'phc_copilot_desc': 'Ask dosage calculations, emergency snakebite ASV protocols, ORS hydration charts, IV drip rates, or live stock burn-rate formulas',
+    'phc_ask_copilot_placeholder': 'Type clinical question or stock formula (e.g. Calculate pediatric paracetamol for 12kg)...',
+    'phc_incoming_directives': 'Directives from State Health Command',
+    'phc_req_to_govt_title': 'Escalate Need to State Command',
+    'phc_drug_inventory_title': 'Real-Time Drug Inventory & Supply Controls',
+    'phc_add_medicine_btn': '+ Add Medicine Batch',
+
+    // Government Command Portal Page
+    'govt_header_title': 'Headquarters Health Command Radar',
+    'govt_header_sub': 'HEALTHGRID AI JHARKHAND COMMAND RADAR',
+    'govt_login_title': 'Government Command Radar Login',
+    'govt_id_label': 'Government ID / Officer ID:',
+    'govt_pass_label': 'Password:',
+    'govt_login_btn': 'Authenticate & Enter Command Radar',
+    'govt_kpi_verified_phcs': 'Verified PHCs',
+    'govt_kpi_active_emergencies': 'Active Citizen Emergencies',
+    'govt_kpi_incoming_requests': 'Incoming PHC Requests',
+    'govt_kpi_supply_corridors': 'AI Supply Corridors',
+    'govt_escalations_title': 'Incoming PHC Support Requests & Requisitions',
+    'govt_telemetry_title': 'Live Real-Time PHC Operational Telemetry (10 PHCs)',
+    'govt_directives_title': 'Dispatch Directive / Supply Order to PHC',
+    'govt_emergencies_radar_title': 'Live Citizen Emergency Radar',
+    'govt_outbreak_radar_title': '72H AI Predictive Outbreak Radar',
+
+    // Simulator Page
+    'sim_header_title': 'Healthcare Digital Twin & Epidemic Stress Simulator',
+    'sim_header_sub': 'RANCHI HEALTHCARE DIGITAL TWIN & EPIDEMIC STRESS SIMULATOR',
+    'sim_control_panel': 'Simulation Control Station',
+    'sim_outbreak_intensity': 'Outbreak Surge Intensity:',
+    'sim_run_btn': 'Run Digital Twin Simulation',
+    'sim_results_title': '72-Hour Supply Rebalancing Forecast',
+
+    // Footer
+    'footer_text': 'Government of Jharkhand • Department of Health & Family Welfare • HealthGrid AI'
+  },
+
+  sant: {
+    // Santali (Ol Chiki / Devanagari transliteration)
+    'govt_jharkhand': 'ᱡᱷᱟᱨᱠᱷᱚᱸᱰ ᱥᱚᱨᱠᱟᱨ (झारखंड सरकार)',
+    'health_dept': 'ᱦᱚᱲᱢᱚ ᱥᱟᱶᱟᱨ ᱵᱤᱵᱷᱟᱜᱽ (स्वास्थ्य विभाग)',
+    'state_health_command': 'ᱯᱚᱱᱚᱛ ᱦᱚᱲᱢᱚ ᱠᱚᱢᱟᱱᱰ (राज्य स्वास्थ्य कमान)',
+    'official_access_only': 'ᱥᱚᱨᱠᱟᱨᱤ ᱵᱚᱞᱚᱱ ᱜᱮ',
+    'prototype_live': '● ᱦᱮᱞᱛᱷᱜᱽᱨᱤᱰ AI ᱞᱟᱭᱤᱵᱽ',
+    'nav_home': 'ᱢᱩᱬᱩᱛ (Home)',
+    'nav_public': 'ᱱᱟᱜᱟᱨᱤᱠ ᱯᱳᱨᱴᱟᱞ (Citizen)',
+    'nav_phc': 'PHC ᱠᱟᱹᱢᱤᱭᱟᱹ ᱯᱳᱨᱴᱟᱞ',
+    'nav_govt': 'ᱥᱚᱨᱠᱟᱨᱤ ᱠᱚᱢᱟᱱᱰ',
+    'nav_simulator': 'ᱥᱤᱢᱩᱞᱮᱴᱚᱨ',
+    'nav_emergency_108': '᱑᱐᱘ ᱟᱯᱟᱛᱠᱟᱞᱤᱱ',
+    'nav_logout': 'ᱚᱰᱚᱠ (Logout)',
+    'nav_login': 'ᱵᱚᱞᱚᱱ (Login)',
+    'news_title': 'ᱱᱟᱣᱟ ᱠᱷᱚᱵᱚᱨ (LATEST NEWS)',
+    'news_badge': '💥 ᱱᱟᱣᱟ',
+    'hero_badge': 'ᱡᱷᱟᱨᱠᱷᱚᱸᱰ ᱦᱮᱞᱛᱷ ᱜᱽᱨᱤᱰ',
+    'hero_title_1': 'ᱞᱟᱦᱟ ᱵᱟᱰᱟᱭ। ᱥᱟᱯᱲᱟᱣ।',
+    'hero_title_2': 'ᱨᱟᱱ ᱦᱟᱹᱴᱤᱧ। ᱡᱤᱣᱤ ᱵᱟᱧᱪᱟᱣ।',
+    'hero_subtitle': 'ᱡᱷᱟᱨᱠᱷᱚᱸᱰ ᱨᱮᱱᱟᱜ ᱡᱚᱛᱚ PHC ᱟᱨ ᱦᱟᱥᱯᱟᱛᱟᱞ ᱡᱚᱲᱟᱣ ᱟᱠᱟᱱ AI ᱥᱤᱥᱴᱚᱢ — ᱗᱒ ᱴᱟᱲᱟᱝ ᱞᱟᱦᱟ ᱨᱟᱱ ᱚᱵᱷᱟᱵᱽ ᱵᱟᱰᱟᱭ ᱟᱨ ᱞᱚᱜᱚᱱ ᱮᱢᱚᱜ।',
+    'card_phc_search_title': 'ᱥᱩᱨ ᱨᱮᱱᱟᱜ ᱦᱟᱥᱯᱟᱛᱟᱞ',
+    'card_phc_search_sub': 'Nearest PHC / CHC',
+    'card_phc_search_desc': 'ᱵᱮᱰ ᱟᱨ ᱰᱟᱠᱴᱚᱨ ᱛᱟᱦᱮᱱ ᱨᱮᱭᱟᱜ ᱞᱟᱭᱤᱵᱽ ᱵᱟᱰᱟᱭ',
+    'card_ai_mitra_title': 'AI ᱦᱚᱲᱢᱚ ᱜᱟᱛᱮ (Health AI)',
+    'card_ai_mitra_sub': 'Swasthya Mitra AI',
+    'card_ai_mitra_desc': '᱒᱔/᱗ ᱨᱩᱣᱟᱹ ᱞᱟᱹᱭ ᱟᱨ ᱨᱟᱱ ᱥᱟᱞᱟᱦ',
+    'card_emergency_title': 'ᱟᱯᱟᱛᱠᱟᱞᱤᱱ ᱜᱚᱲᱚ (Emergency SOS)',
+    'card_emergency_sub': '᱑᱐᱘ ᱦᱮᱞᱯᱞᱟᱭᱤᱱ',
+    'card_emergency_desc': 'ᱥᱚᱡᱷᱮ ᱑᱐᱘ ᱮᱢᱵᱩᱞᱮᱱᱥ ᱠᱚᱞ',
+    'public_header_title': 'ᱱᱟᱜᱟᱨᱤᱠ ᱦᱚᱲᱢᱚ ᱥᱟᱶᱟᱨ ᱟᱨ ᱟᱯᱟᱛᱠᱟᱞᱤᱱ ᱯᱳᱨᱴᱟᱞ',
+    'public_header_sub': 'CITIZEN HEALTHCARE, NEARBY PHC FINDER & 24/7 EMERGENCY SOS',
+    'public_sos_banner_title': '🚨 ᱞᱚᱜᱚᱱ ᱑᱐᱘ ᱟᱯᱟᱛᱠᱟᱞᱤᱱ ᱮᱢᱵᱩᱞᱮᱱᱥ ᱜᱚᱲᱚ',
+    'public_sos_banner_sub': 'ᱜᱟᱹᱦᱤᱨ ᱨᱩᱣᱟᱹ ᱚᱠᱛᱚ ᱥᱩᱨ ᱦᱟᱥᱯᱟᱛᱟᱞ ᱨᱮ GPS ᱠᱷᱚᱵᱚᱨ ᱵᱷᱮᱡᱟᱭ ᱢᱮ',
+    'footer_text': 'ᱡᱷᱟᱨᱠᱷᱚᱸᱰ ᱥᱚᱨᱠᱟᱨ • ᱦᱚᱲᱢᱚ ᱥᱟᱶᱟᱨ ᱵᱤᱵᱷᱟᱜᱽ • HealthGrid AI'
+  },
+
+  bn: {
+    // Bengali (বাংলা)
+    'govt_jharkhand': 'ঝাড়খণ্ড সরকার',
+    'health_dept': 'স্বাস্থ্য, চিকিৎসা শিক্ষা ও পরিবার কল্যাণ বিভাগ',
+    'state_health_command': 'রাজ্য স্বাস্থ্য কমান্ড সেন্টার &bull; RANCHI COMMAND RADAR',
+    'official_access_only': 'কেবলমাত্র প্রাতিষ্ঠানিক ব্যবহারের জন্য',
+    'prototype_live': '● HEALTHGRID AI লাইভ প্রোটোটাইপ',
+    'nav_home': 'হোম',
+    'nav_public': 'নাগরিক পোর্টাল',
+    'nav_phc': 'PHC স্টাফ পোর্টাল',
+    'nav_govt': 'সরকারি কমান্ড',
+    'nav_simulator': 'ডিজিটাল টুইন সিমুলেটর',
+    'nav_emergency_108': '১০৮ জরুরি সেবা',
+    'nav_logout': 'লগআউট',
+    'nav_login': 'লগইন',
+    'news_title': 'তাজা খবর / LATEST NEWS',
+    'news_badge': '💥 নতুন',
+    'hero_badge': 'ঝাড়খণ্ড স্বাস্থ্য গ্রিড • HEALTHGRID JHARKHAND',
+    'hero_title_1': 'পূর্বানুমান। প্রস্তুতি।',
+    'hero_title_2': 'পুনর্বণ্টন। জীবন রক্ষা।',
+    'hero_subtitle': 'ঝাড়খণ্ডের সমস্ত প্রাথমিক স্বাস্থ্য কেন্দ্র (PHC) এবং জেলা হাসপাতালকে সংযুক্তকারী রিয়েল-টাইম স্বাস্থ্য গ্রিড — ৭২ ঘণ্টা পূর্বে ওষুধের ঘাটতি পূর্বাভাস এবং স্বয়ংক্রিয় স্টক পুনঃবণ্টন।',
+    'card_phc_search_title': 'নিকটস্থ স্বাস্থ্য কেন্দ্র',
+    'card_phc_search_sub': 'Find Nearest PHC / CHC',
+    'card_phc_search_desc': 'লাইভ বেড ও ডাক্তার উপস্থিতির তথ্য',
+    'card_ai_mitra_title': 'AI স্বাস্থ্য মিত্র',
+    'card_ai_mitra_sub': 'Citizen Health AI',
+    'card_ai_mitra_desc': '২৪/৭ উপসর্গ বিশ্লেষণ ও প্রাথমিক চিকিৎসার পরামর্শ',
+    'card_emergency_title': 'জরুরি সহায়তা (SOS)',
+    'card_emergency_sub': '১০৮ / ১০৪ হেল্পলাইন',
+    'card_emergency_desc': 'সরাসরি ১০৮ অ্যাম্বুলেন্স জিপিএস কল',
+    'public_header_title': 'নাগরিক স্বাস্থ্য ও জরুরি সহায়তা পোর্টাল',
+    'public_header_sub': 'CITIZEN HEALTHCARE, NEARBY PHC FINDER & 24/7 EMERGENCY SOS',
+    'public_sos_banner_title': '🚨 তাৎক্ষণিক ১০৮ জরুরি অ্যাম্বুলেন্স প্রেরণ (Emergency SOS)',
+    'public_sos_banner_sub': 'সংকটজনক পরিস্থিতিতে সরাসরি নিকটস্থ হাসপাতালে আপনার সঠিক জিপিএস অবস্থান পাঠান বা ১০৮ এ কল করুন',
+    'footer_text': 'ঝাড়খণ্ড সরকার • স্বাস্থ্য ও পরিবার কল্যাণ বিভাগ • HealthGrid AI'
+  }
+};

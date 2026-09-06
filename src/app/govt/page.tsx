@@ -10,10 +10,13 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import NewsTicker from '@/components/NewsTicker';
+import LanguageSelector from '@/components/LanguageSelector';
+import { useLanguage } from '@/context/LanguageContext';
 import { RANCHI_FACILITIES_MASTER } from '@/lib/ranchiData';
 import { PHC_CREDENTIALS_MASTER, GovtDirective, PhcLiveState, PhcGovtRequest } from '@/lib/phcStore';
 
 export default function GovtPortal() {
+  const { t } = useLanguage();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [checkingAuth, setCheckingAuth] = useState<boolean>(true);
   
@@ -284,13 +287,16 @@ export default function GovtPortal() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-slate-100 flex flex-col font-sans jharkhand-bg-watermark">
-        <div className="w-full bg-[#064e3b] text-white px-6 py-2 flex items-center justify-between text-xs font-medium z-20 border-b border-[#047857]">
+        <div className="w-full bg-[#064e3b] text-white px-4 sm:px-6 py-2 flex items-center justify-between text-xs font-medium z-20 border-b border-[#047857]">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>झारखंड सरकार &bull; GOVERNMENT OF JHARKHAND &bull; OFFICIAL ACCESS ONLY</span>
+            <span>{t('header_portal_title')} &bull; {t('govt_login_title')}</span>
           </div>
-          <div className="text-emerald-200 font-bold text-[11px]">
-            HEALTHGRID AI SECURE GATEWAY
+          <div className="flex items-center gap-3">
+            <LanguageSelector />
+            <span className="text-emerald-200 font-bold text-[11px] hidden sm:inline">
+              HEALTHGRID SECURE
+            </span>
           </div>
         </div>
 
@@ -589,13 +595,14 @@ export default function GovtPortal() {
       )}
 
       {/* Top Header */}
-      <div className="w-full bg-[#064e3b] text-white px-6 py-1.5 flex items-center justify-between text-[11px] font-medium z-30 border-b border-[#047857]">
+      <div className="w-full bg-[#064e3b] text-white px-4 sm:px-6 py-1.5 flex items-center justify-between text-[11px] font-medium z-30 border-b border-[#047857]">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
           <span>झारखंड सरकार &bull; राज्य स्वास्थ्य कमान केंद्र &bull; RANCHI COMMAND RADAR</span>
         </div>
-        <div className="flex items-center gap-4 text-emerald-100 font-semibold text-[10px]">
-          <span className="bg-[#047857] px-2.5 py-0.5 rounded text-amber-300 font-bold flex items-center gap-1">
+        <div className="flex items-center gap-3 text-emerald-100 font-semibold text-[10px]">
+          <LanguageSelector />
+          <span className="bg-[#047857] px-2.5 py-0.5 rounded text-amber-300 font-bold flex items-center gap-1 hidden md:flex">
             <ShieldCheck className="w-3.5 h-3.5 text-amber-300" />
             OFFICER: govtjharkhand123
           </span>

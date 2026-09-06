@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function NewsTicker() {
+  const { t } = useLanguage();
   const [newsList, setNewsList] = useState<string[]>([
     "District Resource Envelope 2026 - 27: Health & Family Welfare Department, GoJ",
     "Free Essential Medicine Supply Drive launched across 30+ Primary Health Centers in Ranchi District",
@@ -30,7 +32,7 @@ export default function NewsTicker() {
         <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#f37021]"></div>
         <span className="text-[11px] uppercase tracking-widest whitespace-nowrap flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span>ताज़ा समाचार / LATEST NEWS</span>
+          <span>{t('news_title', 'ताज़ा समाचार / LATEST NEWS')}</span>
         </span>
       </div>
 
@@ -40,7 +42,7 @@ export default function NewsTicker() {
           {newsList.concat(newsList).map((item, idx) => (
             <span key={idx} className="inline-flex items-center gap-2 text-slate-700 hover:text-blue-700 transition-colors font-medium">
               <span className="text-[10px] font-extrabold text-red-600 bg-red-50 border border-red-200 px-1.5 py-0.2 rounded shrink-0">
-                💥 NEW
+                {t('news_badge', '💥 NEW')}
               </span>
               <span>{item}</span>
               <span className="text-slate-300 font-bold ml-4">|</span>

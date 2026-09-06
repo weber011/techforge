@@ -9,6 +9,8 @@ import {
 import Link from 'next/link';
 import NewsTicker from '@/components/NewsTicker';
 import PublicMap, { MapFacility } from '@/components/PublicMap';
+import LanguageSelector from '@/components/LanguageSelector';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -156,6 +158,7 @@ function ChatBubbleContent({ content, role }: { content: string; role: 'user' | 
 }
 
 export default function PublicPortal() {
+  const { t } = useLanguage();
   const [facilities, setFacilities] = useState<MapFacility[]>([]);
   const [loadingFacilities, setLoadingFacilities] = useState(true);
   const [selectedDistrict, setSelectedDistrict] = useState('All');
@@ -375,15 +378,14 @@ export default function PublicPortal() {
     <div className="min-h-screen bg-[#f8fafc] font-sans flex flex-col relative jharkhand-bg-watermark">
       
       {/* Top Official Government Strip */}
-      <div className="w-full bg-[#064e3b] text-white px-6 py-1.5 flex items-center justify-between text-[11px] font-medium z-40 border-b border-[#047857]">
+      <div className="w-full bg-[#064e3b] text-white px-4 sm:px-6 py-1.5 flex items-center justify-between text-[11px] font-medium z-40 border-b border-[#047857]">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span>झारखंड सरकार &bull; नागरिक स्वास्थ्य खोज एवं आपातकालीन सेवा &bull; CITIZEN PORTAL</span>
+          <span>{t('govt_jharkhand', 'झारखंड सरकार')} &bull; {t('public_header_title', 'नागरिक स्वास्थ्य खोज एवं आपातकालीन सेवा')} &bull; CITIZEN PORTAL</span>
         </div>
-        <div className="flex items-center gap-4 text-emerald-100 text-[10px] font-bold">
-          <span>आपातकालीन: 108</span>
-          <span className="text-emerald-400">|</span>
-          <span>स्वास्थ्य सलाह: 104</span>
+        <div className="flex items-center gap-3 text-emerald-100 text-[10px] font-bold">
+          <span className="hidden sm:inline">आपातकालीन: 108 | स्वास्थ्य सलाह: 104</span>
+          <LanguageSelector variant="compact" />
         </div>
       </div>
 
@@ -403,18 +405,19 @@ export default function PublicPortal() {
             </div>
           </Link>
           <div className="border-l-2 border-emerald-600 pl-3">
-            <h1 className="text-sm font-black text-[#064e3b] leading-tight">झारखंड स्वास्थ्य मित्र</h1>
+            <h1 className="text-sm font-black text-[#064e3b] leading-tight">{t('card_ai_mitra_title', 'झारखंड स्वास्थ्य मित्र')}</h1>
             <p className="text-[10px] text-emerald-800 font-bold">CITIZEN HEALTHCARE LOCATOR &amp; AI ADVISOR</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
+          <LanguageSelector variant="light" />
           <button 
             onClick={() => setIsChatOpen(true)}
             className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-100/80 border border-emerald-300 text-[#064e3b] text-xs font-bold hover:bg-emerald-200 transition-colors shadow-2xs"
           >
             <Bot className="w-4 h-4 text-[#047857]" />
-            <span>AI स्वास्थ्य मित्र</span>
+            <span>{t('card_ai_mitra_title', 'AI स्वास्थ्य मित्र')}</span>
           </button>
 
           {/* Real Emergency Button */}
@@ -423,7 +426,7 @@ export default function PublicPortal() {
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-black transition-all shadow-md animate-pulse border border-red-800"
           >
             <AlertTriangle className="w-4 h-4 text-amber-300" />
-            <span>🚨 EMERGENCY (आपातकालीन)</span>
+            <span>{t('nav_emergency_108', '🚨 EMERGENCY (आपातकालीन)')}</span>
           </button>
         </div>
       </header>
