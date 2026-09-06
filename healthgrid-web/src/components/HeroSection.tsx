@@ -41,25 +41,32 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* Public Citizen Navigation */}
+        {/* Public Citizen & Portal Navigation */}
         <nav className="flex items-center gap-2 sm:gap-3 text-xs font-semibold">
           <Link 
             href="/public" 
-            className="px-3.5 py-2 text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg transition-colors inline-flex items-center gap-1.5 font-bold shadow-2xs"
+            className="px-3 py-2 text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg transition-colors inline-flex items-center gap-1.5 font-bold shadow-2xs"
           >
             <HeartPulse className="w-4 h-4 text-emerald-700" />
-            <span>नागरिक स्वास्थ्य पोर्टल</span>
+            <span>नागरिक पोर्टल</span>
           </Link>
           <Link 
-            href="/public" 
-            className="px-3.5 py-2 text-slate-700 hover:text-[#064e3b] hover:bg-emerald-50 rounded-lg transition-colors hidden sm:inline-flex items-center gap-1.5 border border-transparent hover:border-emerald-200 font-bold"
+            href="/phc" 
+            className="px-3 py-2 text-slate-700 hover:text-[#064e3b] hover:bg-emerald-50 rounded-lg transition-colors hidden sm:inline-flex items-center gap-1.5 border border-transparent hover:border-emerald-200 font-bold"
           >
-            <Activity className="w-4 h-4 text-emerald-700" />
-            <span>AI स्वास्थ्य मित्र</span>
+            <Building2 className="w-4 h-4 text-emerald-700" />
+            <span>PHC स्टाफ पोर्टल</span>
+          </Link>
+          <Link 
+            href="/govt" 
+            className="px-3 py-2 text-slate-700 hover:text-[#064e3b] hover:bg-emerald-50 rounded-lg transition-colors hidden md:inline-flex items-center gap-1.5 border border-transparent hover:border-emerald-200 font-bold"
+          >
+            <Lock className="w-3.5 h-3.5 text-emerald-700" />
+            <span>सरकारी कमान</span>
           </Link>
           <a 
             href="tel:108" 
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors shadow-sm font-bold inline-flex items-center gap-1.5 border border-red-700"
+            className="px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors shadow-sm font-bold inline-flex items-center gap-1.5 border border-red-700"
           >
             <AlertTriangle className="w-3.5 h-3.5 text-amber-300" />
             <span>108 आपातकालीन</span>
