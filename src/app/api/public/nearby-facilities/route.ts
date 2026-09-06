@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { RANCHI_FACILITIES_MASTER } from '@/lib/ranchiData';
+import { getPhcLiveState } from '@/lib/phcStore';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,6 +36,7 @@ export async function GET(req: Request) {
 
     let facilitiesWithDistance = RANCHI_FACILITIES_MASTER.map(f => {
       const distance = haversineDistance(userLat, userLng, f.latitude, f.longitude);
+      const liveState = getPhcLiveState(f.facility_id);
       return {
         facility_id: f.facility_id,
         facility_code: f.facility_code,
@@ -50,8 +52,13 @@ export async function GET(req: Request) {
         latitude: f.latitude,
         longitude: f.longitude,
         distance_km: distance,
-        total_beds: f.total_beds,
-        available_beds: f.operational_data.available_beds,
+        total_beds: liveState?.total_beds ?? f.total_beds,
+        available_beds: liveState?.available_beds ?? f.operational_data.available_beds,
+        occupied_beds: liveState?.occupied_beds ?? f.operational_data.occupied_beds,
+        doctors_present: liveState?.doctors_present ?? f.operational_data.doctors_present,
+        ambulance_status: liveState?.ambulance_status ?? (f.emergency_available ? 'READY_24_7' : 'MAINTENANCE'),
+        emergency_room_status: liveState?.emergency_room_status ?? 'ACCEPTING_PATIENTS',
+        live_medicines: liveState?.medicines || [],
         directions_url: `https://www.google.com/maps/dir/?api=1&destination=${f.latitude},${f.longitude}`,
         verification_status: 'Verified public information',
         source: 'Health, Medical Education & Family Welfare Dept, Jharkhand',

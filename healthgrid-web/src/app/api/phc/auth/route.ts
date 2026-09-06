@@ -48,16 +48,15 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
-  // Public directory helper for demo/evaluation
+  // Public directory helper returning facilities without exposing passwords
   return NextResponse.json({
     success: true,
     total_phcs: PHC_CREDENTIALS_MASTER.length,
-    credentials_directory: PHC_CREDENTIALS_MASTER.map(u => ({
+    facilities_directory: PHC_CREDENTIALS_MASTER.map(u => ({
       facility_id: u.facility_id,
       facility_name: u.facility_name,
       block: u.block,
       email: u.email,
-      password: u.password,
       officer: u.medical_officer_in_charge
     }))
   });

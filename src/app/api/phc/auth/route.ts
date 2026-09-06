@@ -51,12 +51,11 @@ export async function GET() {
   return NextResponse.json({
     success: true,
     total_phcs: PHC_CREDENTIALS_MASTER.length,
-    credentials_directory: PHC_CREDENTIALS_MASTER.map(u => ({
+    facilities_directory: PHC_CREDENTIALS_MASTER.map(u => ({
       facility_id: u.facility_id,
       facility_name: u.facility_name,
       block: u.block,
       email: u.email,
-      password: u.password,
       officer: u.medical_officer_in_charge
     }))
   });

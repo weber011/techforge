@@ -579,6 +579,21 @@ export default function PublicPortal() {
                   <p className="text-xs text-emerald-100 mt-0.5">{selectedFacility.address}</p>
                 </div>
 
+                <div className="grid grid-cols-3 gap-1.5 bg-black/20 p-2 rounded-xl border border-emerald-500/40 text-[10.5px]">
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-emerald-200 font-bold uppercase">Beds</span>
+                    <span className="font-black text-white">{selectedFacility.available_beds ?? 20} <span className="text-[9px] text-emerald-300 font-normal">/ {selectedFacility.total_beds ?? 30}</span></span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-emerald-200 font-bold uppercase">Doctors</span>
+                    <span className="font-black text-white">{(selectedFacility as any).doctors_present ?? 4} Present</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-emerald-200 font-bold uppercase">108 Amb</span>
+                    <span className="font-black text-amber-300">{(selectedFacility as any).ambulance_status === 'MAINTENANCE' ? 'Maintenance' : (selectedFacility as any).ambulance_status === 'ON_CALL_DISPATCHED' ? 'On Call' : 'Ready 24/7'}</span>
+                  </div>
+                </div>
+
                 <div className="flex flex-wrap gap-1.5">
                   {selectedFacility.public_services?.slice(0, 4).map((s, idx) => (
                     <span key={idx} className="text-[10px] bg-white/10 px-2 py-0.5 rounded text-emerald-100 font-medium">

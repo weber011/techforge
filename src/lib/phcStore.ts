@@ -35,10 +35,14 @@ export interface PhcLiveState {
   nurses_present: number;
   nurses_sanctioned: number;
   ambulance_ready: boolean;
+  ambulance_status: 'READY_24_7' | 'ON_CALL_DISPATCHED' | 'MAINTENANCE';
+  emergency_room_status: 'ACCEPTING_PATIENTS' | 'CRITICAL_OVERFLOW';
+  oxygen_status: 'OPTIMAL' | 'REFILL_NEEDED';
   medicines: PhcMedicineStock[];
   last_updated: string;
 }
 
+// Government -> PHC Directive
 export interface GovtDirective {
   id: string;
   directive_code: string;
@@ -54,6 +58,25 @@ export interface GovtDirective {
   phc_response_notes?: string;
   phc_responded_at?: string;
   phc_responded_by?: string;
+}
+
+// PHC -> Government Direct Requisition / Support Escalation
+export interface PhcGovtRequest {
+  id: string;
+  request_code: string;
+  created_at: string;
+  source_facility_id: string;
+  source_facility_name: string;
+  source_email: string;
+  category: 'EMERGENCY_DRUG_REQUISITION' | 'SPECIALIST_DOCTOR_NEED' | 'AMBULANCE_DISPATCH_NEED' | 'INFRASTRUCTURE_OR_EQUIPMENT' | 'GENERAL_SUPPORT';
+  urgency: 'CRITICAL_URGENT' | 'HIGH' | 'NORMAL';
+  title: string;
+  description: string;
+  requested_by_officer: string;
+  status: 'PENDING_GOVT_ACTION' | 'GOVT_APPROVED_DISPATCHED' | 'GOVT_RESOLVED' | 'UNDER_REVIEW';
+  govt_response_notes?: string;
+  govt_responded_at?: string;
+  govt_officer_id?: string;
 }
 
 // Master PHC Credentials Registry (10 Ranchi Facilities)
@@ -174,6 +197,7 @@ export const PHC_CREDENTIALS_MASTER: PhcUser[] = [
 const globalForPhc = globalThis as unknown as {
   __HEALTHGRID_PHC_STATES__?: Record<string, PhcLiveState>;
   __HEALTHGRID_GOVT_DIRECTIVES__?: GovtDirective[];
+  __HEALTHGRID_PHC_GOVT_REQUESTS__?: PhcGovtRequest[];
 };
 
 function createDefaultMedicines(facilityId: string): PhcMedicineStock[] {
@@ -277,6 +301,9 @@ if (!globalForPhc.__HEALTHGRID_PHC_STATES__) {
       nurses_present: fac.operational_data.nurses_present,
       nurses_sanctioned: fac.nurses_sanctioned,
       ambulance_ready: true,
+      ambulance_status: 'READY_24_7',
+      emergency_room_status: 'ACCEPTING_PATIENTS',
+      oxygen_status: 'OPTIMAL',
       medicines: createDefaultMedicines(fac.facility_id),
       last_updated: new Date().toISOString()
     };
@@ -315,6 +342,26 @@ if (!globalForPhc.__HEALTHGRID_GOVT_DIRECTIVES__) {
       title: 'Emergency Fever Ward Preparation & Bed Capacity Audit',
       message: 'State Command requires immediate setup of 6 temporary observation beds and status of nebulizers for viral surge.',
       status: 'PENDING_RESPONSE'
+    }
+  ];
+}
+
+// Initialize default PHC -> Government Requests
+if (!globalForPhc.__HEALTHGRID_PHC_GOVT_REQUESTS__) {
+  globalForPhc.__HEALTHGRID_PHC_GOVT_REQUESTS__ = [
+    {
+      id: 'req-001',
+      request_code: 'REQ-PHC-2026-401',
+      created_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+      source_facility_id: 'RNC-CHC-002',
+      source_facility_name: 'Community Health Centre Ratu (Ushamatu)',
+      source_email: 'phc.ratu@gmail.com',
+      category: 'EMERGENCY_DRUG_REQUISITION',
+      urgency: 'CRITICAL_URGENT',
+      title: 'Urgent Drug Shortage: Anti-Snake Venom (ASV) & Paracetamol Stock Depleted',
+      description: 'Incoming bite cases and viral fever surge have lowered ASV buffer to 8 vials and Paracetamol to 180 tablets. Requesting emergency central depot replenishment.',
+      requested_by_officer: 'Dr. Rameshwar Singh (MOIC)',
+      status: 'PENDING_GOVT_ACTION'
     }
   ];
 }
@@ -480,4 +527,67 @@ export function respondToGovtDirective(data: {
   directive.phc_responded_by = data.responded_by || 'PHC Medical Officer';
 
   return directive;
+}
+
+// PHC -> Government Direct Requisitions / Escalation Getters/Updaters
+export function getAllPhcGovtRequests(): PhcGovtRequest[] {
+  return globalForPhc.__HEALTHGRID_PHC_GOVT_REQUESTS__ || [];
+}
+
+export function getPhcGovtRequestsForFacility(facilityIdOrEmail: string): PhcGovtRequest[] {
+  const all = getAllPhcGovtRequests();
+  const clean = facilityIdOrEmail.toLowerCase().trim();
+  return all.filter(r => 
+    r.source_facility_id.toLowerCase() === clean || 
+    r.source_email.toLowerCase() === clean
+  );
+}
+
+export function createPhcGovtRequest(data: {
+  source_facility_id: string;
+  category: PhcGovtRequest['category'];
+  urgency: PhcGovtRequest['urgency'];
+  title: string;
+  description: string;
+  requested_by_officer?: string;
+}): PhcGovtRequest {
+  const phcUser = getPhcUserById(data.source_facility_id) || PHC_CREDENTIALS_MASTER[0];
+  const now = new Date().toISOString();
+  const code = 'REQ-PHC-2026-' + Math.floor(100 + Math.random() * 900);
+
+  const newReq: PhcGovtRequest = {
+    id: 'req-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+    request_code: code,
+    created_at: now,
+    source_facility_id: phcUser.facility_id,
+    source_facility_name: phcUser.facility_name,
+    source_email: phcUser.email,
+    category: data.category,
+    urgency: data.urgency,
+    title: data.title,
+    description: data.description,
+    requested_by_officer: data.requested_by_officer || phcUser.medical_officer_in_charge,
+    status: 'PENDING_GOVT_ACTION'
+  };
+
+  globalForPhc.__HEALTHGRID_PHC_GOVT_REQUESTS__!.unshift(newReq);
+  return newReq;
+}
+
+export function respondToPhcGovtRequest(data: {
+  request_id: string;
+  status: 'GOVT_APPROVED_DISPATCHED' | 'GOVT_RESOLVED' | 'UNDER_REVIEW';
+  response_notes: string;
+  officer_id?: string;
+}): PhcGovtRequest | null {
+  const all = getAllPhcGovtRequests();
+  const req = all.find(r => r.id === data.request_id || r.request_code === data.request_id);
+  if (!req) return null;
+
+  req.status = data.status;
+  req.govt_response_notes = data.response_notes;
+  req.govt_responded_at = new Date().toISOString();
+  req.govt_officer_id = data.officer_id || 'govtjharkhand123 (State Command)';
+
+  return req;
 }

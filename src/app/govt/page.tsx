@@ -5,12 +5,13 @@ import {
   Activity, AlertTriangle, Building2, Package, ShieldAlert, 
   ArrowRight, Lock, LogOut, CheckCircle2, RefreshCw, Send, 
   MapPin, Zap, UserCheck, ShieldCheck, TrendingUp, AlertCircle, X, Bell,
-  MessageSquare, Plus, CheckCircle, Pill, Bed, Sparkles, Phone
+  MessageSquare, Plus, CheckCircle, Pill, Bed, Sparkles, Phone, Truck,
+  Stethoscope, HelpCircle, Check, Clock, Radio
 } from 'lucide-react';
 import Link from 'next/link';
 import NewsTicker from '@/components/NewsTicker';
 import { RANCHI_FACILITIES_MASTER } from '@/lib/ranchiData';
-import { PHC_CREDENTIALS_MASTER, GovtDirective, PhcLiveState } from '@/lib/phcStore';
+import { PHC_CREDENTIALS_MASTER, GovtDirective, PhcLiveState, PhcGovtRequest } from '@/lib/phcStore';
 
 export default function GovtPortal() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -37,6 +38,14 @@ export default function GovtPortal() {
   const [dispatchingDirective, setDispatchingDirective] = useState<boolean>(false);
   const [directiveFeedback, setDirectiveFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  // Incoming PHC Support Escalations State
+  const [phcRequests, setPhcRequests] = useState<PhcGovtRequest[]>([]);
+  const [loadingRequests, setLoadingRequests] = useState<boolean>(false);
+  const [activeRespondModal, setActiveRespondModal] = useState<PhcGovtRequest | null>(null);
+  const [respondAction, setRespondAction] = useState<'GOVT_APPROVED_DISPATCHED' | 'GOVT_RESOLVED' | 'UNDER_REVIEW'>('GOVT_APPROVED_DISPATCHED');
+  const [respondNote, setRespondNote] = useState<string>('');
+  const [submittingResponse, setSubmittingResponse] = useState<boolean>(false);
+
   // Live PHC States (Medicines & Beds)
   const [livePhcStates, setLivePhcStates] = useState<Record<string, PhcLiveState>>({});
   const [loadingLiveStates, setLoadingLiveStates] = useState<boolean>(false);
@@ -62,6 +71,21 @@ export default function GovtPortal() {
       console.error('Failed to load emergencies:', err);
     } finally {
       setLoadingEmergencies(false);
+    }
+  };
+
+  const fetchPhcRequests = async () => {
+    setLoadingRequests(true);
+    try {
+      const res = await fetch('/api/phc/support-request');
+      const data = await res.json();
+      if (data.success && Array.isArray(data.requests)) {
+        setPhcRequests(data.requests);
+      }
+    } catch (err) {
+      console.error('Failed to load PHC support requests:', err);
+    } finally {
+      setLoadingRequests(false);
     }
   };
 
@@ -96,6 +120,7 @@ export default function GovtPortal() {
 
     fetchEmergencies();
     fetchDirectivesAndInventory();
+    fetchPhcRequests();
 
     // Connect to Server-Sent Events stream
     const eventSource = new EventSource('/api/government/emergencies/stream');
@@ -114,8 +139,15 @@ export default function GovtPortal() {
       console.warn('SSE connection disconnected. Will auto-retry.');
     };
 
+    // Periodic polling refresh for live PHC telemetry
+    const interval = setInterval(() => {
+      fetchDirectivesAndInventory();
+      fetchPhcRequests();
+    }, 15000);
+
     return () => {
       eventSource.close();
+      clearInterval(interval);
     };
   }, [isAuthenticated]);
 
@@ -199,6 +231,39 @@ export default function GovtPortal() {
       setDirectiveFeedback({ type: 'error', text: err.message || 'Network error' });
     } finally {
       setDispatchingDirective(false);
+    }
+  };
+
+  // Respond to PHC Support Request
+  const handleActionPhcRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeRespondModal) return;
+
+    setSubmittingResponse(true);
+    try {
+      const res = await fetch('/api/phc/support-request', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          request_id: activeRespondModal.id,
+          status: respondAction,
+          response_notes: respondNote.trim() || (respondAction === 'GOVT_APPROVED_DISPATCHED' ? 'Support requisition approved. Central warehouse dispatch unit notified.' : 'Requisition acknowledged and resolved.'),
+          officer_id: 'govtjharkhand123'
+        })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setActiveRespondModal(null);
+        setRespondNote('');
+        fetchPhcRequests();
+      } else {
+        alert(data.error || 'Failed to update request');
+      }
+    } catch (err) {
+      console.error('Failed to respond to PHC request:', err);
+    } finally {
+      setSubmittingResponse(false);
     }
   };
 
@@ -435,6 +500,94 @@ export default function GovtPortal() {
         </div>
       )}
 
+      {/* GOVT RESPONSE ACTION MODAL (FOR PHC REQUESTS) */}
+      {activeRespondModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border-2 border-emerald-400 flex flex-col gap-4 animate-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-emerald-100">
+              <div>
+                <h3 className="text-sm font-black text-[#064e3b]">PHC सहायता अनुरोध कार्रवाई (Govt Action on PHC Requisition)</h3>
+                <p className="text-[10px] text-slate-500 font-bold">{activeRespondModal.request_code} &bull; {activeRespondModal.source_facility_name}</p>
+              </div>
+              <button onClick={() => setActiveRespondModal(null)} className="text-slate-400 hover:text-slate-600 p-1">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs flex flex-col gap-1.5">
+              <div><strong className="text-slate-700">Category:</strong> <span className="font-bold text-emerald-800">{activeRespondModal.category.replace(/_/g, ' ')}</span></div>
+              <div><strong className="text-slate-700">Urgency:</strong> <span className="font-black text-red-600">{activeRespondModal.urgency}</span></div>
+              <div><strong className="text-slate-700">Subject:</strong> <span className="font-bold text-slate-900">{activeRespondModal.title}</span></div>
+              <div className="text-[11px] text-slate-600 bg-white p-2 rounded border border-slate-200 mt-1 italic">&ldquo;{activeRespondModal.description}&rdquo;</div>
+            </div>
+
+            <form onSubmit={handleActionPhcRequest} className="flex flex-col gap-3 text-xs">
+              <div>
+                <label className="font-bold text-[#064e3b] block mb-1">Select Command Action / कार्रवाई का चयन करें:</label>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setRespondAction('GOVT_APPROVED_DISPATCHED')}
+                    className={`p-2.5 rounded-xl border text-center font-bold text-[11px] transition-all ${
+                      respondAction === 'GOVT_APPROVED_DISPATCHED' ? 'bg-emerald-100 border-emerald-500 text-[#064e3b] ring-2 ring-emerald-500' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                    }`}
+                  >
+                    ✓ Approve &amp; Dispatch
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRespondAction('UNDER_REVIEW')}
+                    className={`p-2.5 rounded-xl border text-center font-bold text-[11px] transition-all ${
+                      respondAction === 'UNDER_REVIEW' ? 'bg-amber-100 border-amber-500 text-amber-900 ring-2 ring-amber-500' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                    }`}
+                  >
+                    ⏳ Under Review
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRespondAction('GOVT_RESOLVED')}
+                    className={`p-2.5 rounded-xl border text-center font-bold text-[11px] transition-all ${
+                      respondAction === 'GOVT_RESOLVED' ? 'bg-blue-100 border-blue-500 text-blue-900 ring-2 ring-blue-500' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                    }`}
+                  >
+                    ✔ Mark Resolved
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold text-[#064e3b] block mb-1">Command Note / निर्देश संदेश:</label>
+                <textarea
+                  rows={3}
+                  value={respondNote}
+                  onChange={(e) => setRespondNote(e.target.value)}
+                  placeholder="e.g. Emergency drug stock vehicle #JH-01-AX-9901 dispatched from Sadar Hospital Central Depot with 500 ASV vials. ETA 35 mins."
+                  className="w-full p-2.5 bg-slate-50 border border-emerald-200 rounded-xl text-slate-800 font-semibold outline-none focus:bg-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveRespondModal(null)}
+                  className="py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingResponse}
+                  className="py-2.5 bg-[#064e3b] hover:bg-[#047857] text-white rounded-xl text-xs font-black transition-colors shadow-md flex items-center justify-center gap-1.5"
+                >
+                  {submittingResponse ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5 text-amber-300" />}
+                  <span>Confirm &amp; Update PHC</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Top Header */}
       <div className="w-full bg-[#064e3b] text-white px-6 py-1.5 flex items-center justify-between text-[11px] font-medium z-30 border-b border-[#047857]">
         <div className="flex items-center gap-2">
@@ -529,13 +682,13 @@ export default function GovtPortal() {
 
           <div className="bg-white/95 backdrop-blur-md p-5 rounded-2xl border-2 border-amber-200 shadow-sm flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-amber-700 uppercase">Govt Directives Active</span>
-              <MessageSquare className="w-5 h-5 text-amber-600" />
+              <span className="text-xs font-bold text-amber-700 uppercase">Incoming PHC Requests</span>
+              <HelpCircle className="w-5 h-5 text-amber-600" />
             </div>
             <div className="text-3xl font-black text-amber-700">
-              {directives.length}
+              {phcRequests.filter(r => r.status === 'PENDING_GOVT_ACTION' || r.status === 'UNDER_REVIEW').length}
             </div>
-            <div className="text-[10px] text-amber-700 font-bold">Two-Way PHC Communication Channel</div>
+            <div className="text-[10px] text-amber-700 font-bold">Pending State Government Action</div>
           </div>
 
           <div className="bg-white/95 backdrop-blur-md p-5 rounded-2xl border-2 border-emerald-200 shadow-sm flex flex-col gap-3">
@@ -547,6 +700,225 @@ export default function GovtPortal() {
               11 Active
             </div>
             <div className="text-[10px] text-emerald-700 font-bold">Automatic Inter-PHC Balancing</div>
+          </div>
+        </section>
+
+        {/* ========================================================= */}
+        {/* INCOMING PHC SUPPORT ESCALATIONS & REQUISITIONS           */}
+        {/* ========================================================= */}
+        <section className="bg-white/95 backdrop-blur-md rounded-2xl border-2 border-amber-300 p-6 shadow-sm flex flex-col gap-4">
+          <div className="flex items-center justify-between border-b border-amber-100 pb-3">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-black uppercase mb-1">
+                <Radio className="w-3 h-3 text-amber-700" />
+                <span>PHC TO GOVT ESCALATION RADAR &bull; प्राथमिक स्वास्थ्य केंद्र आपात मांगें</span>
+              </div>
+              <h3 className="text-sm font-black text-[#064e3b]">
+                PHC से प्राप्त आपातकालीन मांगें एवं सहायता अनुरोध (Incoming PHC Support Requests &amp; Requisitions)
+              </h3>
+              <p className="text-xs text-slate-500 font-medium">
+                Real-time requests initiated directly by PHC Medical Officers (ASV drugs, specialist doctors, 108 ambulances, generator/equipment repairs)
+              </p>
+            </div>
+            <button
+              onClick={fetchPhcRequests}
+              className="p-1.5 hover:bg-amber-50 rounded-lg text-amber-800 text-xs flex items-center gap-1 font-bold border border-amber-200"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loadingRequests ? 'animate-spin' : ''}`} />
+              <span>Refresh Requests</span>
+            </button>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-slate-200 text-slate-600 font-black uppercase text-[10px] bg-amber-50/50">
+                  <th className="py-2.5 px-3">Req Code &amp; Time</th>
+                  <th className="py-2.5 px-2">Source PHC</th>
+                  <th className="py-2.5 px-2">Category &amp; Urgency</th>
+                  <th className="py-2.5 px-2">Request Details</th>
+                  <th className="py-2.5 px-2">Govt Action / Notes</th>
+                  <th className="py-2.5 px-2">Status</th>
+                  <th className="py-2.5 px-2 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {phcRequests.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="p-8 text-center text-slate-400 font-medium">
+                      No incoming PHC support requests at this time.
+                    </td>
+                  </tr>
+                ) : (
+                  phcRequests.map((req) => (
+                    <tr key={req.id} className="hover:bg-amber-50/20 transition-colors">
+                      <td className="py-3 px-3">
+                        <div className="font-mono font-black text-slate-800">{req.request_code}</div>
+                        <div className="text-[10px] text-slate-400">{new Date(req.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                      </td>
+
+                      <td className="py-3 px-2 font-bold text-[#064e3b]">
+                        <div>{req.source_facility_name.replace('Community Health Centre ', 'CHC ').replace('Primary Health Centre ', 'PHC ')}</div>
+                        <div className="text-[10px] text-slate-400 font-medium">{req.requested_by_officer}</div>
+                      </td>
+
+                      <td className="py-3 px-2">
+                        <div className="font-bold text-slate-800 text-[11px]">{req.category.replace(/_/g, ' ')}</div>
+                        <span className={`inline-block text-[9px] font-black px-1.5 py-0.5 rounded mt-0.5 ${
+                          req.urgency === 'CRITICAL_URGENT' ? 'bg-red-100 text-red-700 border border-red-200' :
+                          req.urgency === 'HIGH' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
+                          'bg-slate-100 text-slate-700'
+                        }`}>
+                          {req.urgency}
+                        </span>
+                      </td>
+
+                      <td className="py-3 px-2 max-w-[200px]">
+                        <div className="font-bold text-slate-900 truncate" title={req.title}>{req.title}</div>
+                        <div className="text-[10.5px] text-slate-600 line-clamp-2 mt-0.5" title={req.description}>{req.description}</div>
+                      </td>
+
+                      <td className="py-3 px-2 max-w-[180px]">
+                        {req.govt_response_notes ? (
+                          <div className="text-[10.5px] text-slate-700 italic bg-emerald-50/70 p-1.5 rounded border border-emerald-200">
+                            <span className="font-bold text-[#064e3b] not-italic block text-[9.5px]">Govt Officer Note:</span>
+                            &ldquo;{req.govt_response_notes}&rdquo;
+                          </div>
+                        ) : (
+                          <span className="text-[10px] text-slate-400 italic">No notes recorded yet</span>
+                        )}
+                      </td>
+
+                      <td className="py-3 px-2">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-black ${
+                          req.status === 'PENDING_GOVT_ACTION' ? 'bg-red-100 text-red-900 border border-red-300' :
+                          req.status === 'GOVT_APPROVED_DISPATCHED' ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' :
+                          req.status === 'UNDER_REVIEW' ? 'bg-amber-100 text-amber-900 border border-amber-300' :
+                          'bg-blue-100 text-blue-900 border border-blue-300'
+                        }`}>
+                          {req.status.replace(/_/g, ' ')}
+                        </span>
+                      </td>
+
+                      <td className="py-3 px-2 text-right">
+                        <button
+                          onClick={() => {
+                            setActiveRespondModal(req);
+                            setRespondNote('');
+                            setRespondAction('GOVT_APPROVED_DISPATCHED');
+                          }}
+                          className="px-3 py-1 bg-[#064e3b] hover:bg-[#047857] text-white rounded-lg text-[10.5px] font-bold transition-colors shadow-2xs"
+                        >
+                          Action ➔
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ========================================================= */}
+        {/* LIVE REAL-TIME PHC OPERATIONAL & TELEMETRY RADAR          */}
+        {/* ========================================================= */}
+        <section className="bg-white/95 backdrop-blur-md rounded-2xl border-2 border-emerald-300 p-6 shadow-sm flex flex-col gap-4">
+          <div className="flex items-center justify-between border-b border-emerald-100 pb-3">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 text-[#064e3b] text-[10px] font-black uppercase mb-1">
+                <Activity className="w-3 h-3 text-[#047857]" />
+                <span>STATEWIDE FACILITY TELEMETRY &bull; 10 PHC लाइव स्थिति</span>
+              </div>
+              <h3 className="text-sm font-black text-[#064e3b]">
+                सभी 10 प्राथमिक स्वास्थ्य केंद्रों की लाइव स्थिति (Live Real-Time PHC Operational Telemetry)
+              </h3>
+              <p className="text-xs text-slate-500 font-medium">
+                Live operational beds, doctors on duty, 108 ambulance status, ER status, and essential drug stock across all Ranchi PHCs
+              </p>
+            </div>
+            <button
+              onClick={fetchDirectivesAndInventory}
+              className="p-1.5 hover:bg-emerald-50 rounded-lg text-emerald-800 text-xs flex items-center gap-1 font-bold border border-emerald-200"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loadingLiveStates ? 'animate-spin' : ''}`} />
+              <span>Refresh Telemetry</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {PHC_CREDENTIALS_MASTER.map((phc) => {
+              const live = livePhcStates[phc.facility_id];
+              const totalBeds = live?.total_beds ?? 30;
+              const availBeds = live?.available_beds ?? 20;
+              const doctors = live?.doctors_present ?? 4;
+              const ambStatus = live?.ambulance_status ?? 'READY_24_7';
+              const erStatus = live?.emergency_room_status ?? 'ACCEPTING_PATIENTS';
+              const meds = live?.medicines || [];
+              const safeMeds = meds.filter(m => m.status === 'SAFE').length;
+              const criticalMeds = meds.filter(m => m.status === 'CRITICAL').length;
+
+              return (
+                <div key={phc.facility_id} className="bg-slate-50/80 rounded-2xl border border-emerald-200 p-4 flex flex-col justify-between gap-3 shadow-2xs hover:shadow-sm transition-shadow">
+                  <div className="flex items-start justify-between gap-2 border-b border-emerald-100/60 pb-2">
+                    <div>
+                      <h4 className="text-xs font-black text-[#064e3b]">{phc.facility_name}</h4>
+                      <div className="text-[10px] text-slate-500">Block: {phc.block} &bull; MOIC: {phc.medical_officer_in_charge.split('(')[0]}</div>
+                    </div>
+                    <span className={`text-[9px] font-black px-1.5 py-0.5 rounded ${
+                      erStatus === 'ACCEPTING_PATIENTS' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-red-100 text-red-800 border border-red-300'
+                    }`}>
+                      {erStatus === 'ACCEPTING_PATIENTS' ? 'ER ACCEPTING' : 'ER OVERFLOW'}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="bg-white p-2 rounded-xl border border-slate-200 flex flex-col">
+                      <span className="text-[9.5px] text-slate-500 font-bold uppercase flex items-center gap-1">
+                        <Bed className="w-3 h-3 text-emerald-600" />
+                        Available Beds
+                      </span>
+                      <span className="text-base font-black text-[#064e3b] mt-0.5">
+                        {availBeds} <span className="text-[10px] text-slate-400 font-medium">/ {totalBeds} Total</span>
+                      </span>
+                    </div>
+
+                    <div className="bg-white p-2 rounded-xl border border-slate-200 flex flex-col">
+                      <span className="text-[9.5px] text-slate-500 font-bold uppercase flex items-center gap-1">
+                        <Stethoscope className="w-3 h-3 text-emerald-600" />
+                        Doctors On Duty
+                      </span>
+                      <span className="text-base font-black text-[#064e3b] mt-0.5">
+                        {doctors} <span className="text-[10px] text-slate-400 font-medium">Present</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[10.5px] pt-1 border-t border-slate-200/60">
+                    <div className="flex items-center gap-1 font-semibold text-slate-700">
+                      <Truck className="w-3.5 h-3.5 text-emerald-700" />
+                      <span>108 Amb:</span>
+                      <span className={`font-black ${
+                        ambStatus === 'READY_24_7' ? 'text-emerald-700' :
+                        ambStatus === 'ON_CALL_DISPATCHED' ? 'text-amber-700' : 'text-red-600'
+                      }`}>
+                        {ambStatus === 'READY_24_7' ? 'Ready 24/7' : ambStatus === 'ON_CALL_DISPATCHED' ? 'Dispatched' : 'Maintenance'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1 text-[10px] font-bold">
+                      <Pill className="w-3 h-3 text-slate-500" />
+                      <span>{meds.length} Drugs</span>
+                      {criticalMeds > 0 ? (
+                        <span className="bg-red-100 text-red-700 px-1 rounded text-[9px]">({criticalMeds} Low)</span>
+                      ) : (
+                        <span className="bg-emerald-100 text-emerald-700 px-1 rounded text-[9px]">(Safe)</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </section>
 
