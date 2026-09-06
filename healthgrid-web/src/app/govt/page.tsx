@@ -641,6 +641,9 @@ export default function GovtPortal() {
           <Link href="/simulator" className="text-slate-600 hover:text-[#064e3b] transition-colors">
             Digital Twin Simulator
           </Link>
+          <Link href="/admin/test-logs" className="text-purple-700 hover:text-purple-900 transition-colors">
+            Test &amp; Audit Logs
+          </Link>
           <Link href="/public" className="text-slate-600 hover:text-[#064e3b] transition-colors">
             Citizen View
           </Link>

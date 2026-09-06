@@ -4,7 +4,7 @@ import React from 'react';
 import { 
   ArrowRight, Activity, AlertTriangle, CheckCircle, MapPin, Zap, 
   ShieldAlert, ShieldCheck, Building2, Users, FileText, HeartPulse, 
-  ChevronRight, Lock 
+  ChevronRight, Lock, Terminal 
 } from 'lucide-react';
 import Link from 'next/link';
 import NewsTicker from '@/components/NewsTicker';
@@ -69,6 +69,13 @@ export default function HeroSection() {
           >
             <Lock className="w-3.5 h-3.5 text-emerald-700" />
             <span>{t('nav_govt', 'सरकारी कमान')}</span>
+          </Link>
+          <Link 
+            href="/admin/test-logs" 
+            className="px-3 py-2 text-purple-900 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg transition-colors hidden lg:inline-flex items-center gap-1.5 font-bold shadow-2xs"
+          >
+            <Terminal className="w-3.5 h-3.5 text-purple-700" />
+            <span>Test &amp; Audit Logs</span>
           </Link>
           <LanguageSelector variant="light" />
           <a 
