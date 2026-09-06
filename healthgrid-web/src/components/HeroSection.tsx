@@ -56,27 +56,6 @@ export default function HeroSection() {
             <HeartPulse className="w-4 h-4 text-emerald-700" />
             <span>{t('nav_public', 'नागरिक पोर्टल')}</span>
           </Link>
-          <Link 
-            href="/phc" 
-            className="px-3 py-2 text-slate-700 hover:text-[#064e3b] hover:bg-emerald-50 rounded-lg transition-colors hidden sm:inline-flex items-center gap-1.5 border border-transparent hover:border-emerald-200 font-bold"
-          >
-            <Building2 className="w-4 h-4 text-emerald-700" />
-            <span>{t('nav_phc', 'PHC स्टाफ पोर्टल')}</span>
-          </Link>
-          <Link 
-            href="/govt" 
-            className="px-3 py-2 text-slate-700 hover:text-[#064e3b] hover:bg-emerald-50 rounded-lg transition-colors hidden md:inline-flex items-center gap-1.5 border border-transparent hover:border-emerald-200 font-bold"
-          >
-            <Lock className="w-3.5 h-3.5 text-emerald-700" />
-            <span>{t('nav_govt', 'सरकारी कमान')}</span>
-          </Link>
-          <Link 
-            href="/admin/test-logs" 
-            className="px-3 py-2 text-purple-900 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg transition-colors hidden lg:inline-flex items-center gap-1.5 font-bold shadow-2xs"
-          >
-            <Terminal className="w-3.5 h-3.5 text-purple-700" />
-            <span>Test &amp; Audit Logs</span>
-          </Link>
           <LanguageSelector variant="light" />
           <a 
             href="tel:108" 
