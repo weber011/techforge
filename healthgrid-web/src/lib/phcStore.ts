@@ -416,6 +416,44 @@ export function updatePhcLiveState(
   return updated;
 }
 
+// AI Stock Sentinel Helper
+export function checkAndTriggerAiStockAlert(
+  facilityId: string,
+  medicine: PhcMedicineStock,
+  previousStock?: number
+): PhcGovtRequest | null {
+  const isCritical = medicine.current_stock < 200 || (medicine.min_safety_stock > 0 && medicine.current_stock < medicine.min_safety_stock * 0.4);
+  const isLow = medicine.current_stock < 300 || medicine.current_stock <= medicine.min_safety_stock;
+
+  if (isLow || isCritical) {
+    const existingRecent = (globalForPhc.__HEALTHGRID_PHC_GOVT_REQUESTS__ || []).find(r => 
+      r.source_facility_id === facilityId && 
+      r.title.includes(medicine.name) && 
+      (r.status === 'PENDING_GOVT_ACTION' || r.status === 'UNDER_REVIEW')
+    );
+
+    if (existingRecent) {
+      existingRecent.urgency = isCritical ? 'CRITICAL_URGENT' : 'HIGH';
+      existingRecent.description = `[AI AUTO-SENTINEL UPDATE]: ${medicine.name} stock level at ${medicine.current_stock} ${medicine.unit} (Min Safety: ${medicine.min_safety_stock} ${medicine.unit}). Urgent central warehouse restock requested.`;
+      return existingRecent;
+    }
+
+    const urgency = isCritical ? 'CRITICAL_URGENT' : 'HIGH';
+    const autoReq = createPhcGovtRequest({
+      source_facility_id: facilityId,
+      category: 'EMERGENCY_DRUG_REQUISITION',
+      urgency,
+      title: `[AI SENTINEL ALERT]: ${isCritical ? 'CRITICAL SHORTAGE' : 'LOW STOCK'} - ${medicine.name} (${medicine.current_stock} ${medicine.unit})`,
+      description: `Autonomous AI Sentinel detected inventory depletion below safety threshold (${medicine.current_stock} ${medicine.unit} remaining, Min Safety: ${medicine.min_safety_stock} ${medicine.unit}). Automatic restock requisition triggered for State Command replenishment.`,
+      requested_by_officer: 'HealthGrid AI Inventory Sentinel (Autonomous)'
+    });
+
+    return autoReq;
+  }
+
+  return null;
+}
+
 export function updatePhcMedicineStock(
   facilityId: string,
   medicineId: string,
@@ -431,7 +469,7 @@ export function updatePhcMedicineStock(
 
   if (idx >= 0) {
     const minSafety = meds[idx].min_safety_stock;
-    const status = newStock <= minSafety * 0.4 ? 'CRITICAL' : newStock <= minSafety ? 'LOW' : 'SAFE';
+    const status = newStock < 200 ? 'CRITICAL' : (newStock < 300 || newStock <= minSafety) ? 'LOW' : 'SAFE';
     meds[idx] = {
       ...meds[idx],
       current_stock: newStock,
@@ -439,6 +477,9 @@ export function updatePhcMedicineStock(
       batch_number: batchNumber || meds[idx].batch_number,
       expiry_date: expiryDate || meds[idx].expiry_date
     };
+
+    // Auto-trigger AI Sentinel notification to Government Radar
+    checkAndTriggerAiStockAlert(facilityId, meds[idx]);
   }
 
   return updatePhcLiveState(facilityId, { medicines: meds });
@@ -459,11 +500,15 @@ export function addNewMedicineToPhc(
   const state = getPhcLiveState(facilityId);
   if (!state) return null;
 
+  const status = medicine.current_stock < 200 ? 'CRITICAL' : (medicine.current_stock < 300 || medicine.current_stock <= medicine.min_safety_stock) ? 'LOW' : 'SAFE';
   const newMed: PhcMedicineStock = {
     id: 'MED-CUSTOM-' + Date.now().toString(36),
     ...medicine,
-    status: medicine.current_stock <= medicine.min_safety_stock ? 'LOW' : 'SAFE'
+    status
   };
+
+  // Auto-trigger AI Sentinel if newly registered drug is low
+  checkAndTriggerAiStockAlert(facilityId, newMed);
 
   return updatePhcLiveState(facilityId, { medicines: [...state.medicines, newMed] });
 }
